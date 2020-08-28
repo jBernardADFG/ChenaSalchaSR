@@ -1,3 +1,5 @@
+#' Get a set of initial values for alpha and beta
+#' @export
 get_inits <- function(){
   log_alpha <- c(2.075, 2.303)
   alpha <- exp(log_alpha)

@@ -2,6 +2,7 @@
 #' @param samples (data.frame) output of clean_chains
 #' @param alpha (numeric) desired significance level for credible intervals
 #' @param file_path (character) file path to store output xlsx file
+#' @export
 extract_sr_params <- function(samples, alpha, file_path, model){
   
   log_alpha_1 <- samples[,names(samples) == "log_alpha[1]"]

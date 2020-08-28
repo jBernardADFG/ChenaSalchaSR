@@ -2,6 +2,7 @@
 #' @param samples (data.frame) output of clean_chains
 #' @param alpha (numeric) desired significance level for credible intervals
 #' @param file_path (character) file path to store output xlsx file.
+#' @export
 extract_age_at_maturity <- function(samples, alpha, file_path){
   aam_samples <- samples[,substr(names(samples), 1, 1) == "p" &
                           substr(names(samples), 2, 2) != "h"]

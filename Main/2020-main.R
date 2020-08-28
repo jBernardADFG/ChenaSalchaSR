@@ -1,4 +1,9 @@
+# CLEAR GLOBAL ENVIRONMENT
 rm(list=objects())
+
+# INSTALL AND LOAD PROJECT PACKAGE 
+devtools::install_github("jBernardADFG/ChenaSalchaSR", force=T)
+library(ChenaSalchaSR)
 
 # WHICH MODEL IS BEING RUN ? -- choose one of the following options:
 model <- "base" # basic Ricker model
@@ -8,7 +13,7 @@ model <- "base_tvm_ar" # time varying age-at-maturity and AR(1) term added to ba
 
 # READ IN DATA AND FORMAT FOR USE IN JAGS MODEL
 {
-  setwd("S:/Jordy/ChenaSalchaSpawnerRecruit/R/WorkingDirectory")
+  setwd("S:/Jordy/ChenaSalchaSR/R/WorkingDirectory")
   data <- get_jags_data("Data/2020-Data.xlsx", type="Paired")
 }
 
@@ -26,9 +31,9 @@ model_specs <- set_model_specifications(
   run_name = "base_run_3",
   notes = "Looks like stuff is converging better -- just needs to be run for longer. This is the first big run",
   n_chains = 4,
-  n_iter = 3500000,
-  n_burnin = 250000,
-  n_thin = 1000
+  n_iter = 350, # 3500000
+  n_burnin = 25, # 250000
+  n_thin = 1 # 1000
 )
 
 # RUN JAGS MODEL
@@ -56,7 +61,8 @@ model_specs <- set_model_specifications(
 summary(jags_out)
 MCMCvis::MCMCtrace(jags_out,
                    params = trace_params(params),
-                   filename = paste("Traceplots/", model_specs$run_name, ".pdf", sep=""))
+                   filename = paste("Traceplots/", model_specs$run_name, ".pdf", sep=""),
+                   open_pdf = F)
 
 # CONVERT CHAINS TO AN EASIER TO USE FORMAT AND DISCARD INITIAL SAMPLES IF THE BURNIN PERIOD WAS NOT LONG ENOUGH
 samples <- clean_chains(jags_out)

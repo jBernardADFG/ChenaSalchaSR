@@ -2,6 +2,7 @@
 #' @param samples (data.frame) output of clean_chains
 #' @param alpha (numeric) desired significance level for credible intervals
 #' @param file_path (character) file path to store output xlsx file.
+#' @export
 extract_abundance_estimates <- function(samples, alpha=0.10, file_path){
   
   chena_total <- samples[,substr(names(samples), 1, 7) == "N_1_dot" & 
