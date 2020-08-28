@@ -1,0 +1,15 @@
+Package: ChenaSalchaSR
+Title: Chena Salcha State-Space Spawner-Recruit Analysis
+Version: 0.0.0
+Authors@R: 
+    person(given = "Jordy",
+           family = "Bernard",
+           role = c("aut", "cre"),
+           email = "jordy.bernard@alaska.edu")
+Description: Enter Description
+License: `use_mit_license()`, `use_gpl3_license()` or friends to
+    pick a license
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
