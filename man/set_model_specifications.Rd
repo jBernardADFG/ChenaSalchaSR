@@ -5,7 +5,7 @@
 \title{Specify important information related to model run}
 \usage{
 set_model_specifications(
-  model_name,
+  run_name,
   notes,
   n_chains = 4,
   n_iter = 5e+05,
@@ -15,6 +15,8 @@ set_model_specifications(
 )
 }
 \arguments{
+\item{run_name}{(character) run identifier for output tables and plots. keep it short and informative}
+
 \item{notes}{(character) store a note related to the model run to keep track of why the model is being run with the chosen specs}
 
 \item{n_chains}{(numeric) the number of chains}
@@ -26,8 +28,6 @@ set_model_specifications(
 \item{n_thin}{(numeric) the thinning period}
 
 \item{parallel}{(logical) use parallel = F, or find a working wrapper for parallel computation. jagsUI::jags is a little buggy when parallel=T}
-
-\item{run_name}{(character) run identifier for output tables and plots. keep it short and informative}
 }
 \description{
 Specify important information related to model run
