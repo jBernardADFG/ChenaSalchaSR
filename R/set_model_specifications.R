@@ -7,8 +7,8 @@
 #' @param n_thin (numeric) the thinning period
 #' @param parallel (logical) use parallel = F, or find a working wrapper for parallel computation. jagsUI::jags is a little buggy when parallel=T
 #' @export
-set_model_specifications <- function(model_name, notes, n_chains = 4, n_iter = 500000, n_burnin = 250000, n_thin = 100, parallel = F){
-  list(model_name = model_name,
+set_model_specifications <- function(run_name, notes, n_chains = 4, n_iter = 500000, n_burnin = 250000, n_thin = 100, parallel = F){
+  list(run_name = run_name,
        notes = notes,
        n_chains = n_chains, 
        n_iter = n_iter, 

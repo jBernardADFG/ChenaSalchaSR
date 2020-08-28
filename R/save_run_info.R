@@ -12,14 +12,14 @@ save_run_info <- function(model_specs, run_time, DIC, pD, file_path="Tables/run_
   DIC <- round(DIC, 2)
   pD <- round(pD, 2)
   run_dat <- data.frame(c(model_specs, run_time, DIC, pD))
-  names(run_dat) <- c("model name",
+  names(run_dat) <- c("run name",
                       "notes",
                       "n chains",
                       "n iterations",
                       "n burnin",
                       "n_thin",
                       "parallel",
-                      "time to run (min)",
+                      "time to run (hours)",
                       "DIC",
                       "pD")
   run_dat <- run_dat[,c(1,3:10,2)]
