@@ -1,7 +1,7 @@
 # CLEAR GLOBAL ENVIRONMENT
 rm(list=objects())
 
-# INSTALL AND LOAD PROJECT PACKAGE 
+# INSTALL AND LOAD PROJECT PACKAGE -- once the package has been loaded to your machine, you do not need to rerun these lines 
 devtools::install_github("jBernardADFG/ChenaSalchaSR", force=T)
 library(ChenaSalchaSR)
 
@@ -47,7 +47,7 @@ model_specs <- set_model_specifications(
                           n.burnin = model_specs$n_burnin,
                           n.thin = model_specs$n_thin,
                           parallel = model_specs$parallel,
-                          inits=get_inits)
+                          inits=get_initial_values)
   run_time <- Sys.time()-start_time
 }
 
