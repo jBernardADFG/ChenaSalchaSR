@@ -94,7 +94,8 @@ samples <- clean_chains(jags_out)
   
   horsetail_plot(samples,
                  n_draws=50,
-                 r_up=c(25000, 70000),
+                 sig_lev = 0.1,
+                 r_up=c(35000, 65000),
                  file_path=paste("Plots/horsetail/", model_specs$run_name, ".jpeg", sep=""))
   
   sy_plot(samples,

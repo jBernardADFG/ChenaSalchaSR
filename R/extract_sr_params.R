@@ -60,8 +60,11 @@ extract_sr_params <- function(samples, alpha, file_path, model){
   chena_quants <- apply(chena_params, MARGIN=2, quantile, probs = c(0.5, alpha/2, 1-alpha/2), na.rm=T)
   salcha_quants <- apply(salcha_params, MARGIN=2, quantile, probs = c(0.5, alpha/2, 1-alpha/2), na.rm=T)
   
-  chena_quants <- signif(chena_quants, 2)
-  salcha_quants <- signif(salcha_quants, 2)
+  chena_quants[,5:8] <- round(chena_quants[,5:8])
+  chena_quants[,c(1:4,9)] <- signif(chena_quants[,c(1:4,9)],3)
+  
+  salcha_quants[,5:8] <- round(salcha_quants[,5:8])
+  salcha_quants[,c(1:4,9)] <- signif(salcha_quants[,c(1:4,9)],3)
   
   sr_params <- data.frame(parameter = c("log_alpha", "beta", "phi", "sig_w", "S_max", "S_eq" , "S_msy", "R_msy", "U_msy"),
                           chena = paste(chena_quants[1,], " (", chena_quants[2,], ", ", chena_quants[3,], ")"),
