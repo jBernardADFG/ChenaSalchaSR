@@ -1,8 +1,10 @@
 # CLEAR GLOBAL ENVIRONMENT
 rm(list=objects())
 
-# INSTALL AND LOAD PROJECT PACKAGE -- once the package has been loaded to your machine, you do not need to rerun these lines 
+# INSTALL PROJECT PACKAGE -- once the package has been installed, you do not need to rerun this line 
 devtools::install_github("jBernardADFG/ChenaSalchaSR", force=T)
+
+# LOAD PROJECT PACKAGE
 library(ChenaSalchaSR)
 
 # WHICH MODEL IS BEING RUN ? -- choose one of the following options:
@@ -14,10 +16,11 @@ model <- "base_tvm_ar" # time varying age-at-maturity and AR(1) term added to ba
 # READ IN DATA AND FORMAT FOR USE IN JAGS MODEL
 {
   setwd("S:/Jordy/ChenaSalchaSR/R/WorkingDirectory")
-  data <- get_jags_data("Data/2020-Data.xlsx", type="Paired")
+  data <- get_jags_data("Data/2020-Data-Median.xlsx")
+  # data <- get_jags_data("Data/2020-Data-Max.xlsx") # using different harvest SE's for sensitivity testing
 }
 
-# GET FILE PATH FOR .JAGS FILE
+# GET .JAGS FILE PATH
 mod_path <- paste("Jags/", model, ".jags", sep="")
 
 # SAVE JAGS MODULE AS .JAGS FILE -- only needs to be run when modifications have been made to a jags module
@@ -28,12 +31,12 @@ params <- get_params(model)
 
 # SET MODEL SPECIFICATIONS
 model_specs <- set_model_specifications(
-  run_name = "base_run_3",
-  notes = "Looks like stuff is converging better -- just needs to be run for longer. This is the first big run",
+  run_name = "base_ar_run_4",
+  notes = "A repeated run for validation",
   n_chains = 4,
-  n_iter = 350, # 3500000
-  n_burnin = 25, # 250000
-  n_thin = 1 # 1000
+  n_iter = 3500000, 
+  n_burnin = 250000,
+  n_thin = 1000
 )
 
 # RUN JAGS MODEL

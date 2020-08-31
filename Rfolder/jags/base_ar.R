@@ -181,7 +181,7 @@ write_jags_model.base_ar <- function(path){
     for (y in 1:n_years){
       H_hat_1[y] ~ dnorm(H_1[y], tau_1_star[y])T(0,)
       tau_1_star[y] <- pow(1/sig_1_star[y], 2)
-      sig_1_star[y] <- se_H_hat_1[y]
+      sig_1_star[y] ~ dunif(0, se_H_hat_1[y])
     }
   
     ############################################################################################

@@ -90,8 +90,8 @@ write_jags_model.base_tvm <- function(path){
       }
       D[r] ~ dexp(0.001)T(1,)
       for (a in 1:6){
-        n[1,r,a] ~ dunif(-100, 100)
-        n[2,r,a] ~ dunif((-100-n[1,r,a])/n_years, (100-n[1,r,a])/n_years)
+        n[1,r,a] ~ dunif(-1000, 1000)
+        n[2,r,a] ~ dunif((-1000-n[1,r,a])/n_years, (1000-n[1,r,a])/n_years)
       }
     }
   
@@ -181,7 +181,7 @@ write_jags_model.base_tvm <- function(path){
     for (y in 1:n_years){
       H_hat_1[y] ~ dnorm(H_1[y], tau_1_star[y])T(0,)
       tau_1_star[y] <- pow(1/sig_1_star[y], 2)
-      sig_1_star[y] <- se_H_hat_1[y]
+      sig_1_star[y] ~ dunif(0, se_H_hat_1[y])
     }
   
     ############################################################################################
