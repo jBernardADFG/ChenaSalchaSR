@@ -1,8 +1,13 @@
+# TO DO #
+# SOME RESIDUAL DIAGNOSTICS -- WRITE FUNCTION TO GENERATE PLOT -- DOCUMENT DECREASES IN PRODUCTIVITY #
+# PREDICTED ALLOWABLE HARVEST #
+# MIGHT BE INTERESTING TO RELATE TO SIZE AND AGE-AT-MATURITY #
+
 # CLEAR GLOBAL ENVIRONMENT
 rm(list=objects())
 
 # INSTALL PROJECT PACKAGE -- once the package has been installed, you do not need to rerun this line 
-devtools::install_github("jBernardADFG/ChenaSalchaSR", force=T)
+# devtools::install_github("jBernardADFG/ChenaSalchaSR", force=T)
 
 # LOAD PROJECT PACKAGE
 library(ChenaSalchaSR)
@@ -24,19 +29,20 @@ model <- "base_tvm_ar" # time varying age-at-maturity and AR(1) term added to ba
 mod_path <- paste("Jags/", model, ".jags", sep="")
 
 # SAVE JAGS MODULE AS .JAGS FILE -- only needs to be run when modifications have been made to a jags module
-# save_jags_model(mod_path, model)
+#save_jags_model(mod_path, model)
 
 # PARAMETERS TO MONITOR
 params <- get_params(model)
+params <- c(params, "nu")
 
 # SET MODEL SPECIFICATIONS
 model_specs <- set_model_specifications(
-  run_name = "base_ar_run_4",
-  notes = "A repeated run for validation",
+  run_name = "residuals",
+  notes = "looking at residuals in base model",
   n_chains = 4,
-  n_iter = 3500000, 
-  n_burnin = 250000,
-  n_thin = 1000
+  n_iter = 500000, # 3500000 
+  n_burnin = 250000, # 250000
+  n_thin = 100 # 1000
 )
 
 # RUN JAGS MODEL
@@ -74,15 +80,18 @@ samples <- clean_chains(jags_out)
 {
   extract_abundance_estimates(samples, 
                               alpha=0.10, 
-                              file_path = paste("Tables/abundance_estimates/", model_specs$run_name, ".xlsx", sep=""))
+                              file_path = paste("Tables/abundance_estimates/", model_specs$run_name, ".xlsx", sep=""),
+                              final_year = 2030) # Looks good
   
   extract_abundance_by_age(samples, 
                            alpha=0.10, 
-                           file_path=paste("Tables/abundance_by_age/", model_specs$run_name, ".xlsx", sep=""))
+                           file_path=paste("Tables/abundance_by_age/", model_specs$run_name, ".xlsx", sep=""),
+                           final_year=2030)
   
   extract_age_at_maturity(samples, 
                           alpha=0.10, 
-                          file_path=paste("Tables/age_at_maturity/", model_specs$run_name, ".xlsx", sep=""))
+                          file_path=paste("Tables/age_at_maturity/", model_specs$run_name, ".xlsx", sep=""),
+                          final_year=2030)
   
   extract_sr_params(samples, 
                     alpha=0.10,
@@ -93,7 +102,8 @@ samples <- clean_chains(jags_out)
 # CREATE PLOTS
 {
   age_hist(samples, 
-           file_path=paste("Plots/age_hists/", model_specs$run_name, ".jpeg", sep=""))
+           file_path=paste("Plots/age_hists/", model_specs$run_name, ".jpeg", sep=""),
+           final_year=2020)
   
   horsetail_plot(samples,
                  n_draws=50,
