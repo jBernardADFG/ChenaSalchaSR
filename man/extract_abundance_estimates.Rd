@@ -4,7 +4,7 @@
 \alias{extract_abundance_estimates}
 \title{Extract abundance estimates from Jags output}
 \usage{
-extract_abundance_estimates(samples, alpha = 0.1, file_path)
+extract_abundance_estimates(samples, alpha = 0.1, final_year = 2030, file_path)
 }
 \arguments{
 \item{samples}{(data.frame) output of clean_chains}

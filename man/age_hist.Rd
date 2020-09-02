@@ -4,7 +4,7 @@
 \alias{age_hist}
 \title{Escapement by Age Histogram}
 \usage{
-age_hist(samples, file_path, width = 500, height = 1000)
+age_hist(samples, file_path, width = 500, height = 1000, final_year = 2020)
 }
 \arguments{
 \item{samples}{(data.frame) output of clean_chains}

@@ -29,7 +29,7 @@ model <- "base_tvm_ar" # time varying age-at-maturity and AR(1) term added to ba
 mod_path <- paste("Jags/", model, ".jags", sep="")
 
 # SAVE JAGS MODULE AS .JAGS FILE -- only needs to be run when modifications have been made to a jags module
-#save_jags_model(mod_path, model)
+save_jags_model(mod_path, model)
 
 # PARAMETERS TO MONITOR
 params <- get_params(model)
@@ -118,4 +118,7 @@ samples <- clean_chains(jags_out)
   profile_plot(samples, 
                old_goal_med=c(4000, 5500), old_goal_lo=c(3000, 4000), old_goal_up=c(5000, 7000), # Need to get
                file_path=paste("Plots/profiles/", model_specs$run_name, ".jpeg", sep=""))
+  
+  residual_plot(samples,
+                file_path=paste("Plots/residuals/", model_specs$run_name, ".jpeg", sep="")) # Need to document
 }
