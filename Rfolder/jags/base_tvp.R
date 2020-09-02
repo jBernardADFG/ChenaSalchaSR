@@ -51,15 +51,16 @@ write_jags_model.base_tvp <- function(path){
     for (r in 1:2){
       for (y in 1:n_years){
         log_R[y,r] ~ dnorm(mu_sr[y,r], tau_w[r])
-        mu_sr[y,r] <- log_alpha[y,r] + log(S[y,r]) - beta[r]*S[y,r]
-        log_alpha[y,r] <- c[r] + d[r]*(y-1)
-        alpha[y,r] <- exp(log_alpha[y,r])
+        mu_sr[y,r] <- log(a_0[r]+a_1[r]*(y-1)) + log(S[y,r]) - beta[r]*S[y,r]
+        alpha[y,r] <- a_0[r]+a_1[r]*(y-1)
+        log_alpha[y,r] <- log(alpha[y,r])
         R[y,r] <- exp(log_R[y,r])
+        nu[y,r] <- log_R[y,r]-log(alpha[y,r])-log(S[y,r])+beta[r]*S[y,r]
       }
       tau_w[r] <- pow(1/sig_w[r], 2)
       sig_w[r] ~ dexp(0.1)
-      c[r] ~ dexp(1E-2)
-      d[r] ~ dnorm(0, 1E-1)T(-c[r]/(n_years-1),)
+      a_0[r] ~ dunif(1.1, 20)
+      a_1[r] ~ dunif(-a_0[r]/(n_years), 10)
       beta[r] ~ dexp(1E2)
     }
 

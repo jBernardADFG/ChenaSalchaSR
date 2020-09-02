@@ -53,6 +53,7 @@ write_jags_model.base_tvm <- function(path){
         log_R[y,r] ~ dnorm(mu_sr[y,r], tau_w[r])
         mu_sr[y,r] <- log(alpha[r]) + log(S[y,r]) - beta[r]*S[y,r]
         R[y,r] <- exp(log_R[y,r])
+        nu[y, r] <- log_R[y,r]-log(alpha[r])-log(S[y,r])+beta[r]*S[y,r]
       }
       tau_w[r] <- pow(1/sig_w[r], 2)
       sig_w[r] ~ dexp(0.1)

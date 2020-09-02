@@ -17,12 +17,13 @@ model <- "base" # basic Ricker model
 model <- "base_tvm" # time varying age-at-maturity added to base Ricker 
 model <- "base_ar" # AR(1) term added to base Ricker
 model <- "base_tvm_ar" # time varying age-at-maturity and AR(1) term added to base Ricker
+model <- "base_tvp" # linear constraint placed on productivity parameter
 
 # READ IN DATA AND FORMAT FOR USE IN JAGS MODEL
 {
   setwd("S:/Jordy/ChenaSalchaSR/R/WorkingDirectory")
   data <- get_jags_data("Data/2020-Data-Median.xlsx")
-  # data <- get_jags_data("Data/2020-Data-Max.xlsx") # using different harvest SE's for sensitivity testing
+  # data <- get_jags_data("Data/2020-Data-Max.xlsx") # to use different harvest SE's for sensitivity testing
 }
 
 # GET .JAGS FILE PATH
@@ -32,17 +33,17 @@ mod_path <- paste("Jags/", model, ".jags", sep="")
 save_jags_model(mod_path, model)
 
 # PARAMETERS TO MONITOR
-params <- get_params(model)
-params <- c(params, "nu")
+params <- get_params(model) # Need to get a_0 and a_1 instead of c and d
+# params <- c(params, "nu") # Need to add this argument to all models
 
 # SET MODEL SPECIFICATIONS
 model_specs <- set_model_specifications(
-  run_name = "residuals",
-  notes = "looking at residuals in base model",
+  run_name = "time_varying_productivity",
+  notes = "just debugging stuff",
   n_chains = 4,
-  n_iter = 500000, # 3500000 
-  n_burnin = 250000, # 250000
-  n_thin = 100 # 1000
+  n_iter = 500, # 3500000 
+  n_burnin = 250, # 250000
+  n_thin = 1 # 1000
 )
 
 # RUN JAGS MODEL
@@ -56,7 +57,7 @@ model_specs <- set_model_specifications(
                           n.burnin = model_specs$n_burnin,
                           n.thin = model_specs$n_thin,
                           parallel = model_specs$parallel,
-                          inits=get_initial_values)
+                          inits=get_initial_values(model))
   run_time <- Sys.time()-start_time
 }
 

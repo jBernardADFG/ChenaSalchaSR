@@ -4,7 +4,7 @@
 \alias{get_initial_values}
 \title{Get a set of initial values for alpha and beta}
 \usage{
-get_initial_values()
+get_initial_values(model)
 }
 \description{
 Get a set of initial values for alpha and beta
