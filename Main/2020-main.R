@@ -7,7 +7,7 @@
 rm(list=objects())
 
 # INSTALL PROJECT PACKAGE -- once the package has been installed, you do not need to rerun this line 
-# devtools::install_github("jBernardADFG/ChenaSalchaSR", force=T)
+devtools::install_github("jBernardADFG/ChenaSalchaSR", force=T)
 
 # LOAD PROJECT PACKAGE
 library(ChenaSalchaSR)
@@ -41,9 +41,9 @@ model_specs <- set_model_specifications(
   run_name = "time_varying_productivity",
   notes = "just debugging stuff",
   n_chains = 4,
-  n_iter = 500, # 3500000 
-  n_burnin = 250, # 250000
-  n_thin = 1 # 1000
+  n_iter = 500000, # 3500000 
+  n_burnin = 250000, # 250000
+  n_thin = 100 # 1000
 )
 
 # RUN JAGS MODEL

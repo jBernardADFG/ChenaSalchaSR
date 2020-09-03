@@ -59,8 +59,8 @@ write_jags_model.base_tvp <- function(path){
       }
       tau_w[r] <- pow(1/sig_w[r], 2)
       sig_w[r] ~ dexp(0.1)
-      a_0[r] ~ dunif(1.1, 20)
-      a_1[r] ~ dunif(-a_0[r]/(n_years), 10)
+      a_0[r] ~ dunif(1.01, 20)
+      a_1[r] ~ dunif((1-a_0[r])/(n_years), 10)
       beta[r] ~ dexp(1E2)
     }
 
