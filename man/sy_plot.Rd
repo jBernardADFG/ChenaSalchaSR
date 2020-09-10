@@ -6,6 +6,7 @@
 \usage{
 sy_plot(
   samples,
+  model,
   file_path,
   alpha = 0.5,
   leg_pos = c(17500, 40000),

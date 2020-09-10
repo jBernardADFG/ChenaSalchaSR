@@ -6,6 +6,7 @@
 \usage{
 horsetail_plot(
   samples,
+  model,
   file_path,
   n_draws = 25,
   sig_lev = 0.5,

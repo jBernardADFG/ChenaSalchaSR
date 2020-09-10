@@ -19,6 +19,7 @@ model <- "base_ar" # AR(1) term added to base Ricker
 model <- "base_tvm_ar" # time varying age-at-maturity and AR(1) term added to base Ricker -- this is basically what was used on the Copper
 model <- "base_tvp" # linear constraint placed on productivity parameter
 model <- "base_ld" # modified Ricker curve to account for low-density dynamics
+model <- "base_tvp_ld" # low-density Ricker with time-varying productivity
 
 # READ IN DATA AND FORMAT FOR USE IN JAGS MODEL
 {
@@ -38,11 +39,11 @@ params <- get_params(model)
 
 # SET MODEL SPECIFICATIONS
 model_specs <- set_model_specifications(
-  run_name = "low_densities",
-  notes = "debugging low density model",
+  run_name = "temp",
+  notes = "temp",
   n_chains = 4,
   n_iter = 500, #500000 #3500000 
-  n_burnin = 25, #250000 #250000
+  n_burnin = 250, #250000 #250000
   n_thin = 1 #500 #1000
 )
 
