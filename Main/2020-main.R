@@ -16,8 +16,9 @@ library(ChenaSalchaSR)
 model <- "base" # basic Ricker model
 model <- "base_tvm" # time varying age-at-maturity added to base Ricker 
 model <- "base_ar" # AR(1) term added to base Ricker
-model <- "base_tvm_ar" # time varying age-at-maturity and AR(1) term added to base Ricker
+model <- "base_tvm_ar" # time varying age-at-maturity and AR(1) term added to base Ricker -- this is basically what was used on the Copper
 model <- "base_tvp" # linear constraint placed on productivity parameter
+model <- "base_ld" # modified Ricker curve to account for low-density dynamics
 
 # READ IN DATA AND FORMAT FOR USE IN JAGS MODEL
 {
@@ -33,17 +34,16 @@ mod_path <- paste("Jags/", model, ".jags", sep="")
 save_jags_model(mod_path, model)
 
 # PARAMETERS TO MONITOR
-params <- get_params(model) # Need to get a_0 and a_1 instead of c and d
-# params <- c(params, "nu") # Need to add this argument to all models
+params <- get_params(model)
 
 # SET MODEL SPECIFICATIONS
 model_specs <- set_model_specifications(
-  run_name = "time_varying_productivity",
-  notes = "just debugging stuff",
+  run_name = "low_densities",
+  notes = "debugging low density model",
   n_chains = 4,
-  n_iter = 500000, # 3500000 
-  n_burnin = 250000, # 250000
-  n_thin = 100 # 1000
+  n_iter = 500, #500000 #3500000 
+  n_burnin = 25, #250000 #250000
+  n_thin = 1 #500 #1000
 )
 
 # RUN JAGS MODEL
@@ -57,7 +57,8 @@ model_specs <- set_model_specifications(
                           n.burnin = model_specs$n_burnin,
                           n.thin = model_specs$n_thin,
                           parallel = model_specs$parallel,
-                          inits=get_initial_values(model))
+                          inits=get_initial_values(model)
+                          )
   run_time <- Sys.time()-start_time
 }
 
@@ -104,22 +105,25 @@ samples <- clean_chains(jags_out)
 {
   age_hist(samples, 
            file_path=paste("Plots/age_hists/", model_specs$run_name, ".jpeg", sep=""),
-           final_year=2020)
+           final_year=2030)
   
   horsetail_plot(samples,
+                 model,
                  n_draws=50,
                  sig_lev = 0.1,
                  r_up=c(35000, 65000),
                  file_path=paste("Plots/horsetail/", model_specs$run_name, ".jpeg", sep=""))
   
   sy_plot(samples,
+          model,
           y_up=80000,
           file_path=paste("Plots/expected_yield/", model_specs$run_name, ".jpeg", sep=""))
   
-  profile_plot(samples, 
-               old_goal_med=c(4000, 5500), old_goal_lo=c(3000, 4000), old_goal_up=c(5000, 7000), # Need to get
+  profile_plot(samples,
+               model,
+               old_goal_med=c(4000, 5500), old_goal_lo=c(3000, 4000), old_goal_up=c(5000, 7000),
                file_path=paste("Plots/profiles/", model_specs$run_name, ".jpeg", sep=""))
   
   residual_plot(samples,
-                file_path=paste("Plots/residuals/", model_specs$run_name, ".jpeg", sep="")) # Need to document
+                file_path=paste("Plots/residuals/", model_specs$run_name, ".jpeg", sep=""))
 }

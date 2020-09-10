@@ -8,7 +8,12 @@
 #' @param width (numeric) width of the output plot (in px)
 #' @param height (numeric) height of the output plot (in px)
 #' @export
-horsetail_plot <- function(samples, file_path, n_draws=25, sig_lev=0.50, width=800, height=800, s_up=20000, r_up=c(30000, 30000)){
+horsetail_plot <- function(samples, model, file_path, n_draws=25, sig_lev=0.50, width=800, height=800, s_up=20000, r_up=c(30000, 30000)){
+  
+  if (is.element(model, c("base_tvp"))){
+    stop(paste("Function has not been set up for", model))
+  }
+  
   
   alpha_c <- samples[, names(samples)=="alpha[1]"]
   alpha_s <- samples[, names(samples)=="alpha[2]"]

@@ -1,7 +1,7 @@
-#' Base Ricker with time varying productivity
+#' basic Ricker model
 #' @param path (character) path to write .jags file
 #' @export
-write_jags_model.base_tvp <- function(path){
+write_jags_model.base_ld <- function(path){
   mod <-
     "model{
 
@@ -46,24 +46,43 @@ write_jags_model.base_tvp <- function(path){
     # RS PROCESSES
     # ------------------------------------------
 
+    # # --------------
+    # # SIMPLE RICKER RS PROCESS #
+    # for (r in 1:2){
+    #   for (y in 1:n_years){
+    #     log_R[y,r] ~ dnorm(mu_sr[y,r], tau_w[r])
+    #     mu_sr[y,r] <- log(alpha[r]) + log(S[y,r]) - beta[r]*S[y,r]
+    #     R[y,r] <- exp(log_R[y,r])
+    #     nu[y, r] <- log_R[y,r]-log(alpha[r])-log(S[y,r])+beta[r]*S[y,r]
+    #   }
+    #   tau_w[r] <- pow(1/sig_w[r], 2)
+    #   sig_w[r] ~ dexp(0.1)
+    #   alpha[r] ~ dexp(1E-2)T(1,)
+    #   log_alpha[r] <- log(alpha[r])
+    #   beta[r] ~ dexp(1E2)
+    # }
+    
     # --------------
-    # RICKER RS PROCESS WITH A TIME VARYING PRODUCTIVITY PARAMETER #
+    # CONSIDERING THE DYNAMICS OF LOW DENSITIES -- Take 1 #    
     for (r in 1:2){
       for (y in 1:n_years){
         log_R[y,r] ~ dnorm(mu_sr[y,r], tau_w[r])
-        mu_sr[y,r] <- log(a_0[r]+a_1[r]*(y-1)) + log(S[y,r]) - beta[r]*S[y,r]
-        alpha[y,r] <- a_0[r]+a_1[r]*(y-1)
-        log_alpha[y,r] <- log(alpha[y,r])
+        mu_sr[y,r] <- ifelse(
+          S[y,r] <= S_crit[r],
+          log(alpha[r]/(2*S_crit[r])*S[y,r]^2),
+          log(alpha[r]*(S[y,r]-S_crit[r])*exp(-beta[r]*(S[y,r]-S_crit[r])) + alpha[r]/2*S_crit[r])
+        )
         R[y,r] <- exp(log_R[y,r])
-        nu[y,r] <- log_R[y,r]-log(alpha[y,r])-log(S[y,r])+beta[r]*S[y,r]
+        nu[y, r] <- log_R[y,r]-log(alpha[r])-log(S[y,r])+beta[r]*S[y,r]
       }
       tau_w[r] <- pow(1/sig_w[r], 2)
-      sig_w[r] ~ dexp(0.1)
-      a_0[r] ~ dunif(1, 20)
-      a_1[r] ~ dunif((1-a_0[r])/(n_years-1), 10)
+      sig_w[r] ~ dexp(0.01)
+      alpha[r] ~ dexp(1E-2)T(1,)
+      log_alpha[r] <- log(alpha[r])
       beta[r] ~ dexp(1E2)
+      S_crit[r] ~ dunif(1, 500)
     }
-
+    
     # ------------------------------------------
     # RETURNERS GIVEN RECRUITS #
     # ------------------------------------------
@@ -79,6 +98,7 @@ write_jags_model.base_tvp <- function(path){
     # ------------------------------------------
     # Age-at-maturity probability vector  
     # ------------------------------------------
+
     # ----------------
     # WITHOUT TIME VARYING AGE-AT-MATURITY #
     for (r in 1:2){
@@ -111,6 +131,7 @@ write_jags_model.base_tvp <- function(path){
       tau_q[r] <- pow(1/sig_q[r],2)
       sig_q[r] ~ dexp(0.001)
     }
+    
     
     # --------------
     # MIDDLE YUKON HARVEST #
@@ -166,7 +187,7 @@ write_jags_model.base_tvp <- function(path){
         # AGE DATA FROM THE CHENA AND SALCHA #
         # ------------------------------------------
         N_hat_pr[y, r, 1:6] ~ dmulti(p[y,r,1:6], N_hat_pr_dot[y,r])
-  
+    
       }
     }
   
@@ -185,48 +206,35 @@ write_jags_model.base_tvp <- function(path){
 
     for (r in 1:2){
   
-      # --------------
-      # TIME VARYING PRODUCTIVITY WITHOUT THE AR(1) TERM #
-      for (y in 1:n_years){
-       alpha_prime[y,r] <- alpha[y,r]*exp(pow(sig_w[r], 2)/2)
-      }
-    
-      # --------------
-      # RICKER RS RELATIONSHIP WITH TIME VARYING PRODUCTIVITY PARAMETER #
-      ##### NEED TO VARIFY THAT THESE RELATIONSHIPS HOLD #####
-      for (y in 1:n_years){
-        S_msy[y,r] <- log(alpha_prime[y,r])/beta[r]*(0.5-0.07*log(alpha_prime[y,r]))
-        R_msy[y,r] <- alpha_prime[y,r]*S_msy[y,r]*exp(-beta[r]*S_msy[y,r])
-        MSY[y,r] <- R_msy[y, r]-S_msy[y, r]
-        S_max[y,r] <- 1/beta[r]
-        S_eq[y,r] <- log(alpha_prime[y,r])/beta[r]
-        MSR[y, r] <- alpha_prime[y, r]*S_max[y, r]*exp(-beta[r]*S_max[y, r])
-        U_msy[y,r] <- log(alpha_prime[y,r])*(0.5-0.07*log(alpha_prime[y,r]))
-      }
-
+      # --------------  
+      # WITHOUT THE AR(1) TERM #
+      alpha_prime[r] <- alpha[r]*exp(pow(sig_w[r], 2)/2) # LOG-NORMAL ERROR CORRECTION #
+  
+      # # --------------
+      # # FOR THE RICKER RS RELATIONSHIP WITHOUT TIME VARYING PRODUCTIVITY #
+      # S_msy[r] <- log(alpha_prime[r])/beta[r]*(0.5-0.07*log(alpha_prime[r]))
+      # R_msy[r] <- alpha_prime[r]*S_msy[r]*exp(-beta[r]*S_msy[r])
+      # MSY[r] <- R_msy[r]-S_msy[r]
+      # S_max[r] <- 1/beta[r]
+      # MSR[r] <- alpha_prime[r]*S_max[r]*exp(-beta[r]*S_max[r])
+      # S_eq[r] <- log(alpha_prime[r])/beta[r]
+      # U_msy[r] <- log(alpha_prime[r])*(0.5-0.07*log(alpha_prime[r]))
+  
     }
 
     ###################################################################################################################################  
     ############################  OPTIMAL YIELD, OVERFISHING, AND OPTIMAL RECRUITMENT PROBABILITY PROFILES ############################ 
     ###################################################################################################################################  
-    
+  
     for (i in 1:450){
       S_star[i] <- 50*i
       for (r in 1:2){
-        for (y in 1:n_years){
-          R_star[i,y,r] <- alpha_prime[y, r]*S_star[i]*exp(-beta[r]*S_star[i])
-          SY[i,y,r] <- R_star[i,y,r]-S_star[i]
-      
-          # FOR OPTIMAL YIELD AND OVERFISHING PROFILES #
-          I_90_1[i,y,r] <- step(SY[i,y,r]-0.9*MSY[y,r])
-          I_80_1[i,y,r] <- step(SY[i,y,r]-0.8*MSY[y,r])
-          I_70_1[i,y,r] <- step(SY[i,y,r]-0.7*MSY[y,r])
-    
-          # FOR OPTIMAL RECRUITMENT PROFILE #
-          I_90_2[i,y,r] <- step(R_star[i,y,r]-0.9*MSR[y,r])
-          I_80_2[i,y,r] <- step(R_star[i,y,r]-0.8*MSR[y,r])
-          I_70_2[i,y,r] <- step(R_star[i,y,r]-0.7*MSR[y,r])
-        }
+        R_star[i,r] <- ifelse(
+          S_star[i] >= S_crit[r],
+          alpha_prime[r]/(2*S_crit[r])*S_star[i]^2,
+          alpha_prime[r]*(S_star[i]-S_crit[r])*exp(-beta[r]*(S_star[i]-S_crit[r]) + alpha_prime[r]/2*S_crit[r])
+        )
+        SY[i,r] <- R_star[i,r]-S_star[i]
       }
     }
   }"

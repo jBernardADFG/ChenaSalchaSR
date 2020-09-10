@@ -9,6 +9,11 @@
 #' @param height (numeric) the height of the output jpeg file (in px).
 #' @export
 profile_plot <- function(samples, file_path, old_goal_med, old_goal_lo, old_goal_up, legend_position = c(15000, 1), width=1000, height=1000){
+  
+  if (is.element(model, c("base_tvp"))){
+    stop(paste("Function has not been set up for", model))
+  }
+  
   jpeg(filename=file_path, width=width, height=height, units="px")
   layout(matrix(c(1, 2, 3, 4, 5, 6, 7, 7), ncol=2, byrow=TRUE), heights=c(4,4,4, 2))
   S <- (1:450)*50
