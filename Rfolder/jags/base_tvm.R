@@ -68,11 +68,12 @@ write_jags_model.base_tvm <- function(path){
     for (r in 1:2){
       for (y in (n_ages+1):n_years){
         for (a in 1:6){
-          N_1[y,r,a] <- R[(y-9+a),r]*p[y,r,7-a]
+          N_1[y,r,a] <- R[(y-(a+2)),r]*p[(y-(a+2)),r,a]
         }
-        N_1_dot[y,r] <- sum(N_1[y,r,1:6])
+        N_1_dot[y, r] <- sum(N_1[y,r,1:6])
       }
     }
+    
 
     # ------------------------------------------
     # Age-at-maturity probability vector  
@@ -115,7 +116,6 @@ write_jags_model.base_tvm <- function(path){
       tau_q[r] <- pow(1/sig_q[r],2)
       sig_q[r] ~ dexp(0.001)
     }
-    
     
     # --------------
     # MIDDLE YUKON HARVEST #
@@ -166,13 +166,19 @@ write_jags_model.base_tvm <- function(path){
         # MOVEMENT BETWEEN THE MIDDLE YUKON AND THE CHENA AND SALCHA #
         # ------------------------------------------
         N_hat_q[y,r] ~ dbin(q[y,r], N_hat_t[y])
-      
-        # ------------------------------------------
-        # AGE DATA FROM THE CHENA AND SALCHA #
-        # ------------------------------------------
-        N_hat_pr[y, r, 1:6] ~ dmulti(p[y,r,1:6], N_hat_pr_dot[y,r])
     
       }
+      
+      # ------------------------------------------
+      # AGE DATA FROM THE CHENA AND SALCHA #
+      # ------------------------------------------
+      for (y in (n_ages+1):n_years){
+        N_hat_pr[y, r, 1:6] ~ dmulti(
+          c(p[y-3,r,1], p[y-4,r,2], p[y-5,r,3], p[y-6,r,4], p[y-7,r,5], p[y-8,r,6]),
+          N_hat_pr_dot[y,r]
+        )
+      }
+      
     }
   
     # ------------------------------------------

@@ -70,15 +70,6 @@ write_jags_model.base_tvm_ar <- function(path){
     # ------------------------------------------
     # RETURNERS GIVEN RECRUITS #
     # ------------------------------------------
-    # for (r in 1:2){
-    #   for (y in (n_ages+1):n_years){
-    #     for (a in 1:6){
-    #       N_1[y,r,a] <- R[(y-9+a),r]*p[y,r,7-a]
-    #     }
-    #     N_1_dot[y,r] <- sum(N_1[y,r,1:6])
-    #   }
-    # }
-    
     for (r in 1:2){
       for (y in (n_ages+1):n_years){
         for (a in 1:6){
@@ -184,18 +175,16 @@ write_jags_model.base_tvm_ar <- function(path){
       
       }
       
-      for (y in 9:n_years){
-        
-        # ------------------------------------------
-        # AGE DATA FROM THE CHENA AND SALCHA #
-        # ------------------------------------------
-        
+      # ------------------------------------------
+      # AGE DATA FROM THE CHENA AND SALCHA #
+      # ------------------------------------------
+      for (y in (n_ages+1):n_years){
         N_hat_pr[y, r, 1:6] ~ dmulti(
           c(p[y-3,r,1], p[y-4,r,2], p[y-5,r,3], p[y-6,r,4], p[y-7,r,5], p[y-8,r,6]),
           N_hat_pr_dot[y,r]
         )
-        
       }
+      
     }
   
     # ------------------------------------------
@@ -211,9 +200,6 @@ write_jags_model.base_tvm_ar <- function(path){
     ############################################################################################
     ############################ CALCULATING SOME USEFUL STATISTICS ############################
     ############################################################################################
-
-    # --------------
-    # TOGGLE THE COMMENTS ACCORDING TO THE RS PROCESS 
   
     for (r in 1:2){
   

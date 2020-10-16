@@ -45,9 +45,6 @@ write_jags_model.base_ar <- function(path){
     # ------------------------------------------
     # RS PROCESSES
     # ------------------------------------------
-
-    # --------------  
-    # RICKER RS PROCESS WITH AN AR(1) TERM #
     for (r in 1:2){
       log_R[1,r] ~ dnorm(mu_sr[1,r], tau_w[r])
       mu_sr[1,r] <- log(alpha[r]) + log(S[1,r]) - beta[r]*S[1,r]
@@ -73,16 +70,15 @@ write_jags_model.base_ar <- function(path){
     for (r in 1:2){
       for (y in (n_ages+1):n_years){
         for (a in 1:6){
-          N_1[y,r,a] <- R[(y-9+a),r]*p[y,r,7-a]
+          N_1[y,r,a] <- R[(y-(a+2)),r]*p[(y-(a+2)),r,a]
         }
-        N_1_dot[y,r] <- sum(N_1[y,r,1:6])
+        N_1_dot[y, r] <- sum(N_1[y,r,1:6])
       }
     }
 
     # ------------------------------------------
     # Age-at-maturity probability vector  
     # ------------------------------------------
-    # ----------------
     # WITHOUT TIME VARYING AGE-AT-MATURITY #
     for (r in 1:2){
       for (y in 1:n_years){
@@ -167,12 +163,19 @@ write_jags_model.base_ar <- function(path){
         # ------------------------------------------
         N_hat_q[y,r] ~ dbin(q[y,r], N_hat_t[y])
       
-        # ------------------------------------------
-        # AGE DATA FROM THE CHENA AND SALCHA #
-        # ------------------------------------------
-        N_hat_pr[y, r, 1:6] ~ dmulti(p[y,r,1:6], N_hat_pr_dot[y,r])
-    
       }
+      
+      # ------------------------------------------
+      # AGE DATA FROM THE CHENA AND SALCHA #
+      # ------------------------------------------
+      for (y in (n_ages+1):n_years){
+        N_hat_pr[y, r, 1:6] ~ dmulti(
+          c(p[y-3,r,1], p[y-4,r,2], p[y-5,r,3], p[y-6,r,4], p[y-7,r,5], p[y-8,r,6]),
+          N_hat_pr_dot[y,r]
+        )
+      }
+      
+      
     }
   
     # ------------------------------------------
@@ -187,9 +190,6 @@ write_jags_model.base_ar <- function(path){
     ############################################################################################
     ############################ CALCULATING SOME USEFUL STATISTICS ############################
     ############################################################################################
-
-    # --------------
-    # TOGGLE THE COMMENTS ACCORDING TO THE RS PROCESS 
   
     for (r in 1:2){
   

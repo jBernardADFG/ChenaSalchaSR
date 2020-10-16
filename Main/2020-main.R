@@ -12,15 +12,20 @@ devtools::install_github("jBernardADFG/ChenaSalchaSR", force=T)
 # LOAD PROJECT PACKAGE
 library(ChenaSalchaSR)
 
-# WHICH MODEL IS BEING RUN ? -- choose one of the following options:
+# WHICH MODEL IS BEING RUN ? 
+# choose one of the following options:
 model <- "base" # basic Ricker model
 model <- "base_tvm" # time varying age-at-maturity added to base Ricker 
-model <- "base_ar" # AR(1) term added to base Ricker
+model <- "base_ar" # AR(1) term added to base Ricker --
 model <- "base_tvm_ar" # time varying age-at-maturity and AR(1) term added to base Ricker -- this is basically what was used on the Copper
-model <- "base_tvm_ar_ash" # time varying age-at-maturity, AR(1) term, and age-stratified harvest terms added to base model
-model <- "base_tvp" # linear constraint placed on productivity parameter
-model <- "base_ld" # modified Ricker curve to account for low-density dynamics
-model <- "base_tvp_ld" # low-density Ricker with time-varying productivity
+model <- "base_tvp" # time varying productivity term added to base Ricker
+model <- "base_tvm_tvp" # time varying maturity and time varying productivity added to base Ricker  
+model <- "base_tvm_ar_tvp" # time varying age-at-maturity, AR(1), and time varying productivity terms added to base Ricker
+
+# still working on implementing these:
+model <- "base_tvm_ar_ash" # time varying age-at-maturity, AR(1), and age-stratified-harvest terms added to base Ricker
+model <- "base_tvm_ar_ld" # low-density Ricker curve with time-varying productivity and AR(1) terms
+model <- "base_tvm_ar_wl" # time varying age-at-maturity, AR(1), and water level terms added to base Ricker
 
 # READ IN DATA AND FORMAT FOR USE IN JAGS MODEL
 {
@@ -40,12 +45,12 @@ params <- get_params(model)     #####
 
 # SET MODEL SPECIFICATIONS
 model_specs <- set_model_specifications(
-  run_name = "building Phil's model",
-  notes = "attempt 1",
+  run_name = "base final test",
+  notes = "preparing base model for final cook",
   n_chains = 4,
   n_iter = 5000, #500000 #3500000 
   n_burnin = 2500, #250000 #250000
-  n_thin = 10, #500 #1000
+  n_thin = 1, #500 #1000
   parallel = F
 )
 

@@ -19,6 +19,12 @@ save_jags_model <- function(mod_path, model){
   if (model=="base_tvp"){
     write_jags_model.base_tvp(mod_path)
   }
+  if (model == "base_tvm_tvp"){
+    write_jags_model.base_tvm_tvp(mod_path)
+  }
+  if (model == "base_tvm_ar_tvp"){
+    write_jags_model.base_tvm_ar_tvp(mod_path)
+  }
   if (model=="base_ld"){
     write_jags_model.base_ld(mod_path)
   }
