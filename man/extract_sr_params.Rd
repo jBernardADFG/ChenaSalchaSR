@@ -4,7 +4,7 @@
 \alias{extract_sr_params}
 \title{Extract biological reference points and parameters contained in the SR relationship}
 \usage{
-extract_sr_params(samples, alpha, file_path, model)
+extract_sr_params(samples, model, alpha, file_path)
 }
 \arguments{
 \item{samples}{(data.frame) output of clean_chains}

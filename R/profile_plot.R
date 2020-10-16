@@ -10,7 +10,7 @@
 #' @export
 profile_plot <- function(samples, file_path, old_goal_med, old_goal_lo, old_goal_up, legend_position = c(15000, 1), width=1000, height=1000){
   
-  if (is.element(model, c("base_tvp"))){
+  if (is.element(model, c("base_tvp", "base_ld"))){
     stop(paste("Function has not been set up for", model))
   }
   

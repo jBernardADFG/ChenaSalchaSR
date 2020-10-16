@@ -17,6 +17,7 @@ model <- "base" # basic Ricker model
 model <- "base_tvm" # time varying age-at-maturity added to base Ricker 
 model <- "base_ar" # AR(1) term added to base Ricker
 model <- "base_tvm_ar" # time varying age-at-maturity and AR(1) term added to base Ricker -- this is basically what was used on the Copper
+model <- "base_tvm_ar_ash" # time varying age-at-maturity, AR(1) term, and age-stratified harvest terms added to base model
 model <- "base_tvp" # linear constraint placed on productivity parameter
 model <- "base_ld" # modified Ricker curve to account for low-density dynamics
 model <- "base_tvp_ld" # low-density Ricker with time-varying productivity
@@ -24,7 +25,7 @@ model <- "base_tvp_ld" # low-density Ricker with time-varying productivity
 # READ IN DATA AND FORMAT FOR USE IN JAGS MODEL
 {
   setwd("S:/Jordy/ChenaSalchaSR/R/WorkingDirectory")
-  data <- get_jags_data("Data/2020-Data-Median.xlsx")
+  data <- get_jags_data("Data/2020-Data-Median.xlsx", model)
   # data <- get_jags_data("Data/2020-Data-Max.xlsx") # to use different harvest SE's for sensitivity testing
 }
 
@@ -35,16 +36,17 @@ mod_path <- paste("Jags/", model, ".jags", sep="")
 save_jags_model(mod_path, model)
 
 # PARAMETERS TO MONITOR
-params <- get_params(model)
+params <- get_params(model)     #####
 
 # SET MODEL SPECIFICATIONS
 model_specs <- set_model_specifications(
-  run_name = "temp",
-  notes = "temp",
+  run_name = "building Phil's model",
+  notes = "attempt 1",
   n_chains = 4,
-  n_iter = 500, #500000 #3500000 
-  n_burnin = 250, #250000 #250000
-  n_thin = 1 #500 #1000
+  n_iter = 5000, #500000 #3500000 
+  n_burnin = 2500, #250000 #250000
+  n_thin = 10, #500 #1000
+  parallel = F
 )
 
 # RUN JAGS MODEL

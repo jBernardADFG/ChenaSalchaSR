@@ -1,7 +1,7 @@
-#' Time varying age-at-maturity and AR(1) term added to base Ricker
+#' time varying age-at-maturity, AR(1) term, and age-stratified harvest terms added to base model
 #' @param path (character) path to write .jags file
 #' @export
-write_jags_model.base_tvm_ar <- function(path){
+write_jags_model.base_tvm_ash <- function(path){
   mod <-
     "model{
 
@@ -10,23 +10,25 @@ write_jags_model.base_tvm_ar <- function(path){
     ########################################################################
 
     # ------------------------------------------
-    # IN-RIVER-RUN-ABUNDANCE ON THE CHENA AND SALCHA DURING THE INITIAL YEARS #
+    # IN-RIVER-RUN-ABUNDANCE ON THE CHENA AND SALCHA DURING THE INITIAL YEARS
     # ------------------------------------------
     for (r in 1:2){
-      for (y in 1:n_ages){
-        N_2[y,r] ~ dnorm(mu_N[r], tau_N[r])T(0,)
+      for (a in 1:6){
+        for (y in 1:n_ages){
+          N_2[y,r,a] ~ dnorm(mu_N[r,a], tau_N[r,a])T(0,)
+        }
+        mu_N[r,a] ~ dunif(0,15000)
+        tau_N[r,a] <- pow(1/sig_N[r,a], 2)
+        sig_N[r,a] ~ dexp(1E-4)
       }
-      mu_N[r] ~ dunif(1000,15000)
-      tau_N[r] <- pow(1/sig_N[r], 2)
-      sig_N[r] ~ dexp(1E-4)
     }
   
     # ------------------------------------------
     # HARVEST ON THE CHENA AND SALCHA #
     # ------------------------------------------
     for (r in 1:2){
-      for (y in 1:n_years){                                                    
-        H_2[y,r] ~ dnorm(mu_2[r], tau_2[r])T(0,N_2[y,r])
+      for (y in 1:n_years){
+        H_2[y,r] ~ dnorm(mu_2[r], tau_2[r])T(0, N_2_dot[y,r])
       }
       mu_2[r] ~ dunif(0, 2000)
       tau_2[r] <- pow(1/sig_2[r], 2)
@@ -37,17 +39,37 @@ write_jags_model.base_tvm_ar <- function(path){
     # SPAWNERS GIVEN IN-RIVER-RUN ABUNDANCE AND HARVEST ON THE CHENA AND SALCHA #
     # ------------------------------------------
     for (r in 1:2){
-      for (y in 1:n_years){                               
-        S[y,r] <- max(N_2[y,r]-H_2[y,r], 0.0001)
+      for (a in 1:6){
+        for (y in 1:n_years){                               
+          S_a[y,r,a] <- max(N_2[y,r,a]-p_2[y,r,a]*H_2[y,r], 0.0001)
+        }
       }
     }
+    
+    # ------------------------------------------
+    # AGE PROPORTION OF HARVEST ON CHENA AND SALCHA  #
+    # ------------------------------------------
+    for (r in 1:2){
+      for (y in 1:n_years){
+        p_2[y,r,1:6] ~ ddirch(gamma_2[r,1:6])
+      }
+      for (a in 1:6){
+        gamma_2[r,a]~ dexp(0.0001)
+      }
+    }  
   
     # ------------------------------------------
-    # RS PROCESSES
+    # TOTAL NUMBER OF SPAWNERS
     # ------------------------------------------
-
-    # --------------  
-    # RICKER RS PROCESS WITH AN AR(1) TERM #
+    for (r in 1:2){
+      for (y in 1:n_years){                               
+        S[y,r] <- sum(S_a[y,r,1:6]) 
+      }
+    }
+    
+    # ------------------------------------------
+    # RICKER SR PROCESS WITH AN AR(1) TERM #
+    # ------------------------------------------
     for (r in 1:2){
       log_R[1,r] ~ dnorm(mu_sr[1,r], tau_w[r])
       mu_sr[1,r] <- log(alpha[r]) + log(S[1,r]) - beta[r]*S[1,r]
@@ -70,14 +92,6 @@ write_jags_model.base_tvm_ar <- function(path){
     # ------------------------------------------
     # RETURNERS GIVEN RECRUITS #
     # ------------------------------------------
-    # for (r in 1:2){
-    #   for (y in (n_ages+1):n_years){
-    #     for (a in 1:6){
-    #       N_1[y,r,a] <- R[(y-9+a),r]*p[y,r,7-a]
-    #     }
-    #     N_1_dot[y,r] <- sum(N_1[y,r,1:6])
-    #   }
-    # }
     
     for (r in 1:2){
       for (y in (n_ages+1):n_years){
@@ -87,14 +101,10 @@ write_jags_model.base_tvm_ar <- function(path){
         N_1_dot[y, r] <- sum(N_1[y,r,1:6])
       }
     }
-    
 
     # ------------------------------------------
-    # Age-at-maturity probability vector  
+    # TIME VARYING AGE AT MATURITY # 
     # ------------------------------------------
-  
-    # ----------------
-    # WITH TIME VARYING AGE AT MATURITY #  
     for (r in 1:2){
       for (y in 1:n_years){
         p[y,r,1:6] ~ ddirch(gamma[y,r,1:6]+0.1)
@@ -111,26 +121,51 @@ write_jags_model.base_tvm_ar <- function(path){
       }
     }
   
-    # --------------
+    # ------------------------------------------
     # IRRA GIVEN RETURNERS AND MIDDLE YUKON HARVEST #
-    # --------------
+    # ------------------------------------------
     for (r in 1:2){
-      for (y in (n_ages+1):n_years){
-        N_2[y,r] <- max(N_1_dot[y,r]-q[y,r]*H_1[y], 0.0001) 
+      for (a in 1:6){
+        for (y in (n_ages+1):n_years){
+          N_2[y,r,a] <- max(N_1[y,r,a]-q[y,r]*p_1[y,a]*H_1[y], 0.0001) 
+        }
       }
     }
+    
+    # ------------------------------------------
+    # TOTAL IN-RIVER RUN ABUNDANCE #
+    # ------------------------------------------
+    for (r in 1:2){
+      for (y in 1:n_years){
+        N_2_dot[y,r] <- sum(N_2[y,r,1:6])
+      }
+    }
+    
+    
+    # ------------------------------------------
+    # PROBABILITY OF MOVEMENT TO CHENA/SALCHA FROM MIDDLE YUKON #
+    # ------------------------------------------
     for (r in 1:2){
       for (y in 1:n_ages){
         q[y,r] ~ dnorm(mu_q[r], tau_q[r])
       }
       for (y in (n_ages+1):n_years){
-        q[y,r] ~ dnorm(mu_q[r], tau_q[r])T(0,min(1,N_1_dot[y,r]/H_1[y]))
+        q[y,r] ~ dnorm(mu_q[r], tau_q[r])T(0, min(1,min(N_1[y,r,1:6])/H_1[y]))
       }
       mu_q[r] ~ dunif(0,1)
       tau_q[r] <- pow(1/sig_q[r],2)
       sig_q[r] ~ dexp(0.001)
     }
     
+    # ------------------------------------------
+    # AGE PROPORTION OF HARVEST ON MIDDLE YUKON  #
+    # ------------------------------------------
+    for (y in 1:n_years){
+        p_1[y,1:6] ~ ddirch(gamma_1[1:6])
+    }
+    for (a in 1:6){
+      gamma_1[a]~ dexp(0.0001)
+    }
     
     # --------------
     # MIDDLE YUKON HARVEST #
@@ -146,12 +181,14 @@ write_jags_model.base_tvm_ar <- function(path){
     ############################ OBSERVATION PROCESS ############################
     #############################################################################
     
+    
     for (y in 1:n_years){
       # ------------------------------------------
       # MARK-RECAPTURE ABUNDANCE ESTIMATES #
       # ------------------------------------------
-      log_N_hat_mr[y, 1] ~ dnorm(log(N_2[y,1]) - delta[y], tau_mr[y,1])
-      log_N_hat_mr[y, 2] ~ dnorm(log(N_2[y,2]), tau_mr[y,2])
+      
+      log_N_hat_mr[y, 1] ~ dnorm(log(N_2_dot[y,1]) - delta[y], tau_mr[y,1])
+      log_N_hat_mr[y, 2] ~ dnorm(log(N_2_dot[y,2]), tau_mr[y,2])
       delta[y] ~ dexp(lambda)
       for(r in 1:2){
         tau_mr[y,r] <- 1/var_mr[y,r]
@@ -166,13 +203,15 @@ write_jags_model.base_tvm_ar <- function(path){
         # ------------------------------------------
         # TOWER COUNTS #
         # ------------------------------------------
-        log_N_hat_tow[y, r] ~ dnorm(log(N_2[y,r]), tau_tow[y,r])
+        
+        log_N_hat_tow[y, r] ~ dnorm(log(N_2_dot[y,r]), tau_tow[y,r])
         tau_tow[y,r] <- 1/var_tow[y,r]
         var_tow[y,r] <- log(pow(tow_cv[y,r],2)+1)
-    
+
         # ------------------------------------------
         # CHENA AND SALCHA HARVEST #
         # ------------------------------------------
+        
         H_hat_2[y,r] ~ dnorm(H_2[y,r], tau_2_star[y,r])T(0,)
         tau_2_star[y,r] <- pow(1/sig_2_star[y,r], 2)
         sig_2_star[y,r] <- se_H_hat_2[y,r]
@@ -180,22 +219,40 @@ write_jags_model.base_tvm_ar <- function(path){
         # ------------------------------------------
         # MOVEMENT BETWEEN THE MIDDLE YUKON AND THE CHENA AND SALCHA #
         # ------------------------------------------
+        
         N_hat_q[y,r] ~ dbin(q[y,r], N_hat_t[y])
       
+      }
+    }
+    
+    
+    
+    
+    for (y in (n_ages+1):n_years){
+    
+      # ------------------------------------------
+      # AGE DATA FROM MIDDLE YUKON #
+      # ------------------------------------------
+        
+      N_hat_pm[y, 1:6] ~ dmulti(
+        c(p_1[y-3,1], p_1[y-4,2], p_1[y-5,3], p_1[y-6,4], p_1[y-7,5], p_1[y-8,6]),
+        N_hat_pm_dot[y]
+      )
+        
+      for(r in 1:2){
+        
         # ------------------------------------------
         # AGE DATA FROM THE CHENA AND SALCHA #
         # ------------------------------------------
-        # N_hat_pr[y, r, 1:6] ~ dmulti(p[y,r,1:6], N_hat_pr_dot[y,r])
-        
+      
         N_hat_pr[y, r, 1:6] ~ dmulti(
-          c(p[y-3,r,1], p[y-4,r,2], p[y-5,r,3], p[y-6,r,4], p[y-7,r,5], p[y-8,r,6]),
+          c(p_2[y-3,r,1], p_2[y-4,r,2], p_2[y-5,r,3], p_2[y-6,r,4], p_2[y-7,r,5], p_2[y-8,r,6]),
           N_hat_pr_dot[y,r]
         )
         
-    
       }
     }
-  
+
     # ------------------------------------------
     # HARVEST IN THE MIDDLE YUKON #
     # ------------------------------------------

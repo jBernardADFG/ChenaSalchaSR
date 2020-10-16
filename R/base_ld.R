@@ -189,47 +189,19 @@ write_jags_model.base_ld <- function(path){
     ############################################################################################
 
     for (r in 1:2){
-  
       # --------------  
       # WITHOUT THE AR(1) TERM #
       alpha_prime[r] <- alpha[r]*exp(pow(sig_w[r], 2)/2) # LOG-NORMAL ERROR CORRECTION #
-  
-      # # --------------
-      # # NOT WORRYING ABOUT THIS STUFF RIGHT NOW #
-      # S_msy[r] <- log(alpha_prime[r])/beta[r]*(0.5-0.07*log(alpha_prime[r]))
-      # R_msy[r] <- alpha_prime[r]*S_msy[r]*exp(-beta[r]*S_msy[r])
-      # MSY[r] <- R_msy[r]-S_msy[r]
-      # S_max[r] <- 1/beta[r]
-      # MSR[r] <- alpha_prime[r]*S_max[r]*exp(-beta[r]*S_max[r])
-      # S_eq[r] <- log(alpha_prime[r])/beta[r]
-      # U_msy[r] <- log(alpha_prime[r])*(0.5-0.07*log(alpha_prime[r]))
-  
     }
-
-    ###################################################################################################################################  
-    ############################  OPTIMAL YIELD, OVERFISHING, AND OPTIMAL RECRUITMENT PROBABILITY PROFILES ############################ 
-    ###################################################################################################################################  
-  
     for (i in 1:450){
       S_star[i] <- 50*i
       for (r in 1:2){
         R_star[i,r] <- ifelse(
           S_star[i] <= S_crit[r],
-          alpha[r]/(2*S_crit[r])*S_star[i]^2,
-          alpha[r]*(max(S_star[i]-S_crit[r], 0.01))*exp(-beta[r]*(max(S_star[i]-S_crit[r], 0.01))) + alpha[r]/2*S_crit[r]
+          alpha_prime[r]/(2*S_crit[r])*S_star[i]^2,
+          alpha_prime[r]*(max(S_star[i]-S_crit[r], 0.01))*exp(-beta[r]*(max(S_star[i]-S_crit[r], 0.01))) + alpha_prime[r]/2*S_crit[r]
         )
         SY[i,r] <- R_star[i,r]-S_star[i]
-     
-        # # FOR OPTIMAL YIELD AND OVERFISHING PROFILES #
-        # I_90_1[i,r] <- step(SY[i,r]-0.9*MSY[r])
-        # I_80_1[i,r] <- step(SY[i,r]-0.8*MSY[r])
-        # I_70_1[i,r] <- step(SY[i,r]-0.7*MSY[r])
-        #
-        # # FOR OPTIMAL RECRUITMENT PROFILE #
-        # I_90_2[i,r] <- step(R_star[i,r]-0.9*MSR[r])
-        # I_80_2[i,r] <- step(R_star[i,r]-0.8*MSR[r])
-        # I_70_2[i,r] <- step(R_star[i,r]-0.7*MSR[r])
-    
       }
     }
     

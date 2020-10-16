@@ -3,7 +3,8 @@
 #' @param type (String) The type of analysis to run. Accepted values are "Paired", "Chena", and "Salcha".
 #' @export
 
-get_jags_data <- function(file_path, type="Paired"){
+get_jags_data <- function(file_path, model){
+  type="Paired"
   if (!is.element(type, c("Paired","Chena", "Salcha"))){
     stop("type must be Paired, Chena, or Salcha")
   }
@@ -34,6 +35,15 @@ get_jags_data <- function(file_path, type="Paired"){
   jags_data$H_hat_2 <- as.matrix(jags_data$H_hat_2)
   jags_data$se_H_hat_2 <- as.matrix(jags_data$se_H_hat_2)
   jags_data$N_hat_q <- as.matrix(jags_data$N_hat_q)
-  jags_data <- jags_data[names(jags_data) %in% c("N_hat_pm", "N_hat_pm_dot") == FALSE] # Comment out to keep N_hat_pm and N_hat_pm_dot
+  
+  if (model != "base_tvm_ar_ash"){
+    jags_data <- jags_data[names(jags_data) %in% c("N_hat_pm", "N_hat_pm_dot") == FALSE]
+  }else{
+    jags_data$N_hat_pm <- jags_data$N_hat_pm[,1,]
+    jags_data$N_hat_pm_dot <- jags_data$N_hat_pm_dot[,1]
+  }
+
+
+  
   return(jags_data)
 }

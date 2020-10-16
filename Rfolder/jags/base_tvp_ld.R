@@ -47,27 +47,15 @@ write_jags_model.base_tvp_ld <- function(path){
     # ------------------------------------------
 
     # --------------
-    # RICKER RS PROCESS WITH A TIME VARYING PRODUCTIVITY PARAMETER #
+    # RICKER RS PROCESS WITH A TIME VARYING PRODUCTIVITY PARAMETER AND A LINEAR CONSTRAINT ON THE PRODUCTIVITY PARAMETER #
     for (r in 1:2){
       for (y in 1:n_years){
         log_R[y,r] ~ dnorm(mu_sr[y,r], tau_w[r])
-        
-        
-        ##### START MODIFICATION #####
         mu_sr[y,r] <- ifelse(
           S[y,r] <= S_crit[y,r],
           log(a_0[r]+a_1[r]*(y-1))-log(2*S_crit[y,r])+2*log(S[y,r]),
           log((a_0[r]+a_1[r]*(y-1))*(max(S[y,r]-S_crit[y,r], 0.01))*exp(-beta[r]*(max(S[y,r]-S_crit[y,r], 0.01))) + (a_0[r]+a_1[r]*(y-1))/2*S_crit[y,r])
         )
-        
-        # mu_sr[y,r] <- ifelse(
-        #   S[y,r] <= S_crit[r],
-        #   log(5.5)-log(2*S_crit[r])+2*log(S[y,r]),
-        #   log(5.5*max(S[y,r]-S_crit[r], 0.01)*exp(-beta[r]*max(S[y,r]-S_crit[r], 0.01)) + 5.5/2*S_crit[r])
-        # )
-        
-        ##### END MODIFICATION #####
-        
         alpha[y,r] <- a_0[r]+a_1[r]*(y-1)
         log_alpha[y,r] <- log(alpha[y,r])
         R[y,r] <- exp(log_R[y,r])
@@ -200,54 +188,27 @@ write_jags_model.base_tvp_ld <- function(path){
     ############################ CALCULATING SOME USEFUL STATISTICS ############################
     ############################################################################################
 
-    # for (r in 1:2){
-    #
-    #  # --------------
-    #  # TIME VARYING PRODUCTIVITY WITHOUT THE AR(1) TERM #
-    #  for (y in 1:n_years){
-    #   alpha_prime[y,r] <- alpha[y,r]*exp(pow(sig_w[r], 2)/2)
-    #  }
-    # 
-    #  # --------------
-    #  # NOT GOING TO WORRY ABOUT THIS PIECE RIGHT NOW #
-    #  for (y in 1:n_years){
-    #    S_msy[y,r] <- log(alpha_prime[y,r])/beta[r]*(0.5-0.07*log(alpha_prime[y,r]))
-    #    R_msy[y,r] <- alpha_prime[y,r]*S_msy[y,r]*exp(-beta[r]*S_msy[y,r])
-    #    MSY[y,r] <- R_msy[y, r]-S_msy[y, r]
-    #    S_max[y,r] <- 1/beta[r]
-    #    S_eq[y,r] <- log(alpha_prime[y,r])/beta[r]
-    #    MSR[y, r] <- alpha_prime[y, r]*S_max[y, r]*exp(-beta[r]*S_max[y, r])
-    #    U_msy[y,r] <- log(alpha_prime[y,r])*(0.5-0.07*log(alpha_prime[y,r]))
-    #  }
-    #
-    # }
-
-    ###################################################################################################################################  
-    ############################  OPTIMAL YIELD, OVERFISHING, AND OPTIMAL RECRUITMENT PROBABILITY PROFILES ############################ 
-    ###################################################################################################################################  
-    
+    for (r in 1:2){  
+      for (y in 1:n_years){
+        # --------------
+        # TIME VARYING PRODUCTIVITY WITHOUT THE AR(1) TERM #
+        alpha_prime[y,r] <- alpha[y,r]*exp(pow(sig_w[r], 2)/2)
+      }
+    }  
     for (i in 1:450){
       S_star[i] <- 50*i
       for (r in 1:2){
         for (y in 1:n_years){
           R_star[i,y,r] <- ifelse(
             S_star[i] <= S_crit[y,r],
-            (a_0[r]+a_1[r]*(y-1))/(2*S_crit[y,r])*S_star[i]^2,
-            (a_0[r]+a_1[r]*(y-1))*(max(S_star[i]-S_crit[y,r], 0.01))*exp(-beta[r]*(max(S_star[i]-S_crit[y,r], 0.01))) + (a_0[r]+a_1[r]*(y-1))/2*S_crit[y,r]
+            alpha_prime[y,r]/(2*S_crit[y,r])*S_star[i]^2,
+            alpha_prime[y,r]*(max(S_star[i]-S_crit[y,r], 0.01))*exp(-beta[r]*(max(S_star[i]-S_crit[y,r], 0.01))) + alpha_prime[y,r]/2*S_crit[y,r]
           )
           SY[i,y,r] <- R_star[i,y,r]-S_star[i]
-          # # FOR OPTIMAL YIELD AND OVERFISHING PROFILES #
-          # I_90_1[i,y,r] <- step(SY[i,y,r]-0.9*MSY[y,r])
-          # I_80_1[i,y,r] <- step(SY[i,y,r]-0.8*MSY[y,r])
-          # I_70_1[i,y,r] <- step(SY[i,y,r]-0.7*MSY[y,r])
-          #   
-          # # FOR OPTIMAL RECRUITMENT PROFILE #
-          # I_90_2[i,y,r] <- step(R_star[i,y,r]-0.9*MSR[y,r])
-          # I_80_2[i,y,r] <- step(R_star[i,y,r]-0.8*MSR[y,r])
-          # I_70_2[i,y,r] <- step(R_star[i,y,r]-0.7*MSR[y,r])
         }
       }
     }
+    
   }"
   writeLines(mod,con=path)
 }

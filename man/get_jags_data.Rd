@@ -4,7 +4,7 @@
 \alias{get_jags_data}
 \title{Read in and format data for JAGS}
 \usage{
-get_jags_data(file_path, type = "Paired")
+get_jags_data(file_path, model)
 }
 \arguments{
 \item{file_path}{(String) Directory to the xlsx data. Note: the format of the excel table needs to be standardized (see Data/2020-Data.xlsx).}
