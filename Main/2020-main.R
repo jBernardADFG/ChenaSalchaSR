@@ -45,8 +45,8 @@ params <- get_params(model)     #####
 
 # SET MODEL SPECIFICATIONS
 model_specs <- set_model_specifications(
-  run_name = "base final test",
-  notes = "preparing base model for final cook",
+  run_name = "base_tvm_ar_tvp final test",
+  notes = "preparing base_tvm_ar_tvp model for final cook",
   n_chains = 4,
   n_iter = 5000, #500000 #3500000 
   n_burnin = 2500, #250000 #250000

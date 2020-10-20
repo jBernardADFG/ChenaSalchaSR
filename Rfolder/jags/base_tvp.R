@@ -1,7 +1,12 @@
 #' Base Ricker with time varying productivity
 #' @param path (character) path to write .jags file
 #' @export
+#' Base Ricker with time varying productivity
+#' @param path (character) path to write .jags file
+#' @export
+
 write_jags_model.base_tvp <- function(path){
+  
   mod <-
     "model{
 
@@ -20,7 +25,7 @@ write_jags_model.base_tvp <- function(path){
       tau_N[r] <- pow(1/sig_N[r], 2)
       sig_N[r] ~ dexp(1E-4)
     }
-  
+
     # ------------------------------------------
     # HARVEST ON THE CHENA AND SALCHA #
     # ------------------------------------------
@@ -32,7 +37,7 @@ write_jags_model.base_tvp <- function(path){
       tau_2[r] <- pow(1/sig_2[r], 2)
       sig_2[r] ~ dexp(1E-4)
     }
-  
+
     # ------------------------------------------
     # SPAWNERS GIVEN IN-RIVER-RUN ABUNDANCE AND HARVEST ON THE CHENA AND SALCHA #
     # ------------------------------------------
@@ -41,7 +46,7 @@ write_jags_model.base_tvp <- function(path){
         S[y,r] <- max(N_2[y,r]-H_2[y,r], 0.0001)
       }
     }
-  
+
     # ------------------------------------------
     # RS PROCESSES
     # ------------------------------------------
@@ -70,15 +75,18 @@ write_jags_model.base_tvp <- function(path){
     for (r in 1:2){
       for (y in (n_ages+1):n_years){
         for (a in 1:6){
-          N_1[y,r,a] <- R[(y-(a+2)),r]*p[(y-(a+2)),r,a]
+          N_1[y,r,a] <- R[(y-9+a),r]*p[y,r,7-a]
         }
-        N_1_dot[y, r] <- sum(N_1[y,r,1:6])
+        N_1_dot[y,r] <- sum(N_1[y,r,1:6])
       }
     }
 
     # ------------------------------------------
     # Age-at-maturity probability vector  
-    # ------------------------------------------
+    # -----------------------------------------
+
+    # ----------------
+    # WITHOUT TIME VARYING AGE-AT-MATURITY #
     for (r in 1:2){
       for (y in 1:n_years){
         p[y,r,1:6] ~ ddirch(gamma[r,1:6]+0.1)
@@ -89,7 +97,7 @@ write_jags_model.base_tvp <- function(path){
         gamma[r,a] ~ dexp(0.1)
       }  
     }
-
+    
     # --------------
     # IRRA GIVEN RETURNERS AND MIDDLE YUKON HARVEST #
     # --------------
@@ -109,7 +117,9 @@ write_jags_model.base_tvp <- function(path){
       tau_q[r] <- pow(1/sig_q[r],2)
       sig_q[r] ~ dexp(0.001)
     }
+
     
+
     # --------------
     # MIDDLE YUKON HARVEST #
     # --------------
@@ -119,11 +129,14 @@ write_jags_model.base_tvp <- function(path){
     mu_1 ~ dunif(0, 30000)
     tau_1 <- pow(1/sig_1, 2)
     sig_1 ~ dexp(1E-5)  
-  
+
+
     #############################################################################
     ############################ OBSERVATION PROCESS ############################
     #############################################################################
+
     
+
     for (y in 1:n_years){
       # ------------------------------------------
       # MARK-RECAPTURE ABUNDANCE ESTIMATES #
@@ -137,66 +150,60 @@ write_jags_model.base_tvp <- function(path){
       }
     }
     lambda ~ dexp(0.01)
-    
+
     for(r in 1:2){
       for (y in 1:n_years){
-    
+
         # ------------------------------------------
         # TOWER COUNTS #
         # ------------------------------------------
         log_N_hat_tow[y, r] ~ dnorm(log(N_2[y,r]), tau_tow[y,r])
         tau_tow[y,r] <- 1/var_tow[y,r]
         var_tow[y,r] <- log(pow(tow_cv[y,r],2)+1)
-    
+
         # ------------------------------------------
         # CHENA AND SALCHA HARVEST #
         # ------------------------------------------
         H_hat_2[y,r] ~ dnorm(H_2[y,r], tau_2_star[y,r])T(0,)
         tau_2_star[y,r] <- pow(1/sig_2_star[y,r], 2)
         sig_2_star[y,r] <- se_H_hat_2[y,r]
-    
+
         # ------------------------------------------
+
         # MOVEMENT BETWEEN THE MIDDLE YUKON AND THE CHENA AND SALCHA #
         # ------------------------------------------
         N_hat_q[y,r] ~ dbin(q[y,r], N_hat_t[y])
-      
+
+        # ------------------------------------------
+        # AGE DATA FROM THE CHENA AND SALCHA #
+        # ------------------------------------------
+        N_hat_pr[y, r, 1:6] ~ dmulti(p[y,r,1:6], N_hat_pr_dot[y,r])
       }
-      
-      # ------------------------------------------
-      # AGE DATA FROM THE CHENA AND SALCHA #
-      # ------------------------------------------
-      for (y in (n_ages+1):n_years){
-        N_hat_pr[y, r, 1:6] ~ dmulti(
-          c(p[y-3,r,1], p[y-4,r,2], p[y-5,r,3], p[y-6,r,4], p[y-7,r,5], p[y-8,r,6]),
-          N_hat_pr_dot[y,r]
-        )
-      }
-      
     }
-  
+
     # ------------------------------------------
     # HARVEST IN THE MIDDLE YUKON #
     # ------------------------------------------
+
     for (y in 1:n_years){
       H_hat_1[y] ~ dnorm(H_1[y], tau_1_star[y])T(0,)
       tau_1_star[y] <- pow(1/sig_1_star[y], 2)
       sig_1_star[y] ~ dunif(0, se_H_hat_1[y])
     }
-  
+
     ############################################################################################
     ############################ CALCULATING SOME USEFUL STATISTICS ############################
     ############################################################################################
-
     for (r in 1:2){
-  
       # --------------
       # TIME VARYING PRODUCTIVITY WITHOUT THE AR(1) TERM #
       for (y in 1:n_years){
        alpha_prime[y,r] <- alpha[y,r]*exp(pow(sig_w[r], 2)/2)
       }
-    
+
       # --------------
       # RICKER RS RELATIONSHIP WITH TIME VARYING PRODUCTIVITY PARAMETER #
+      ##### NEED TO VARIFY THAT THESE RELATIONSHIPS HOLD #####
       for (y in 1:n_years){
         S_msy[y,r] <- log(alpha_prime[y,r])/beta[r]*(0.5-0.07*log(alpha_prime[y,r]))
         R_msy[y,r] <- alpha_prime[y,r]*S_msy[y,r]*exp(-beta[r]*S_msy[y,r])
@@ -206,33 +213,31 @@ write_jags_model.base_tvp <- function(path){
         MSR[y, r] <- alpha_prime[y, r]*S_max[y, r]*exp(-beta[r]*S_max[y, r])
         U_msy[y,r] <- log(alpha_prime[y,r])*(0.5-0.07*log(alpha_prime[y,r]))
       }
-
     }
 
     ###################################################################################################################################  
     ############################  OPTIMAL YIELD, OVERFISHING, AND OPTIMAL RECRUITMENT PROBABILITY PROFILES ############################ 
     ###################################################################################################################################  
-    
     for (i in 1:450){
       S_star[i] <- 50*i
       for (r in 1:2){
         for (y in 1:n_years){
           R_star[i,y,r] <- alpha_prime[y, r]*S_star[i]*exp(-beta[r]*S_star[i])
           SY[i,y,r] <- R_star[i,y,r]-S_star[i]
-      
+
           # FOR OPTIMAL YIELD AND OVERFISHING PROFILES #
           I_90_1[i,y,r] <- step(SY[i,y,r]-0.9*MSY[y,r])
           I_80_1[i,y,r] <- step(SY[i,y,r]-0.8*MSY[y,r])
           I_70_1[i,y,r] <- step(SY[i,y,r]-0.7*MSY[y,r])
-    
+
           # FOR OPTIMAL RECRUITMENT PROFILE #
           I_90_2[i,y,r] <- step(R_star[i,y,r]-0.9*MSR[y,r])
           I_80_2[i,y,r] <- step(R_star[i,y,r]-0.8*MSR[y,r])
           I_70_2[i,y,r] <- step(R_star[i,y,r]-0.7*MSR[y,r])
+          
         }
       }
     }
   }"
-  
   writeLines(mod,con=path)
 }

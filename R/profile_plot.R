@@ -8,7 +8,7 @@
 #' @param width (numeric) the width of the output jpeg file (in px).
 #' @param height (numeric) the height of the output jpeg file (in px).
 #' @export
-profile_plot <- function(samples, file_path, old_goal_med, old_goal_lo, old_goal_up, legend_position = c(15000, 1), width=1000, height=1000){
+profile_plot <- function(samples, model, file_path, old_goal_med, old_goal_lo, old_goal_up, legend_position = c(15000, 1), width=1000, height=1000){
   
   if (is.element(model, c("base_tvp", "base_ld"))){
     stop(paste("Function has not been set up for", model))
@@ -39,7 +39,16 @@ profile_plot <- function(samples, file_path, old_goal_med, old_goal_lo, old_goal
   poly_y <- c(0,1,1,0)
   polygon(poly_x, poly_y, col=rgb(0.5,  0.5, 0.5, 0.2))
   lines(c(old_goal_med[1], old_goal_med[1]), c(0,1), lty=2, lwd=3)
+  
+ 
+  
+ 
   lines(c(legend_position[1], legend_position[1]+2000), c(legend_position[2], legend_position[2]), col=rgb(1,0,0), lwd=3)
+  
+  
+  
+ 
+  
   lines(c(legend_position[1], legend_position[1]+2000), c(legend_position[2]-0.06, legend_position[2]-0.06), col=rgb(0,1,0), lwd=3)
   lines(c(legend_position[1], legend_position[1]+2000), c(legend_position[2]-0.12, legend_position[2]-0.12), col=rgb(0,0,1), lwd=3)
   text(x=legend_position[1]+2000, y=legend_position[2], labels="... 70% MSY", cex=1, pos=4)

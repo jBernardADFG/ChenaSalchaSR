@@ -1,7 +1,7 @@
 #' Get a set of initial values for alpha and beta
 #' @export
 get_initial_values <- function(model){
-  if (!is.element(model, c("base_tvp", "base_tvp_ld"))){
+  if (!is.element(model, c("base_tvp", "base_tvm_tvp", "base_tvm_ar_tvp", "base_tvp_ld"))){
     f <- function(){
       log_alpha <- c(2.075, 2.303)
       alpha <- exp(log_alpha)
