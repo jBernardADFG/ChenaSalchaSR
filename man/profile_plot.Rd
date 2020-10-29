@@ -6,6 +6,7 @@
 \usage{
 profile_plot(
   samples,
+  model,
   file_path,
   old_goal_med,
   old_goal_lo,
