@@ -1,6 +1,5 @@
 #' Time varying age-at-maturity and AR(1) term added to base Ricker
 #' @param path (character) path to write .jags file
-#' @export
 write_jags_model.base_tvm_ar_tvp <- function(path){
   mod <-
     "model{

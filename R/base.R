@@ -1,6 +1,5 @@
 #' basic Ricker model
 #' @param path (character) path to write .jags file
-#' @export
 write_jags_model.base <- function(path){
   mod <-
     "model{

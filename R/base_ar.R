@@ -1,6 +1,5 @@
 #' AR(1) term added to base Ricker
 #' @param path (character) path to write .jags file
-#' @export
 write_jags_model.base_ar <- function(path){
   mod <-
   "model{
