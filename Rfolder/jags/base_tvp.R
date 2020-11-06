@@ -75,9 +75,9 @@ write_jags_model.base_tvp <- function(path){
     for (r in 1:2){
       for (y in (n_ages+1):n_years){
         for (a in 1:6){
-          N_1[y,r,a] <- R[(y-9+a),r]*p[y,r,7-a]
+          N_1[y,r,a] <- R[(y-(a+2)),r]*p[(y-(a+2)),r,a]
         }
-        N_1_dot[y,r] <- sum(N_1[y,r,1:6])
+        N_1_dot[y, r] <- sum(N_1[y,r,1:6])
       }
     }
 

@@ -7,7 +7,7 @@
 get_params(model)
 }
 \arguments{
-\item{model}{(character) the model that is being run. Accepted values are "base", "base_tvm", "base_ar", and "base_tvm_ar".}
+\item{model}{(character) the model that is being run. Accepted values are "base", "base_tvm", "base_ar", "base_tvm_ar", and "base_tvp".}
 }
 \description{
 Retrieve model specific parameters to monitor

@@ -1,7 +1,8 @@
 #' Optimal Yield, Overfishing, and Optimal Recruitment Probability Plot
 #' @param samples (data.frame) output of clean_chains.
+#' @param model (character) the model being run
 #' @param file_path (character) file path to store the output jpeg file.
-#' @param old_goal_median (numeric) vector of length 2 specifying the old escapement goal. The first entry cooresponds to the Chena while the second entry cooresponds to the Salcha.  
+#' @param old_goal_med (numeric) vector of length 2 specifying the old escapement goal. The first entry cooresponds to the Chena while the second entry cooresponds to the Salcha.  
 #' @param old_goal_lo (numeric) vector of length 2 specifying the lower bound of the old escapement goal. The first entry cooresponds to the Chena while the second entry cooresponds to the Salcha. 
 #' @param old_goal_up (numeric)  vector of length 2 specifying the upper bound of the old escapement goal. The first entry cooresponds to the Chena while the second entry cooresponds to the Salcha. 
 #' @param legend_position (numeric) vector of length 2 specifying the x and y coordinate where the legend should be positioned in each plot.

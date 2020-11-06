@@ -4,7 +4,7 @@
 \alias{extract_age_at_maturity}
 \title{Extract estimates of total run abundance by age from Jags output}
 \usage{
-extract_age_at_maturity(samples, alpha, file_path, final_year = 2020)
+extract_age_at_maturity(samples, alpha, file_path)
 }
 \arguments{
 \item{samples}{(data.frame) output of clean_chains}

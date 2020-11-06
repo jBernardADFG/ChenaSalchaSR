@@ -9,7 +9,7 @@ clean_chains(samples, burnin_further = 0)
 \arguments{
 \item{samples}{Output of jagsUI::jags}
 
-\item{burnin_further}{The number of additional MCMC iterations to discard as burnin}
+\item{burnin_further}{(numeric) The number of additional MCMC iterations to discard as burnin}
 }
 \description{
 Convert chains to an easier to use format and burnin further if the burnin period was not long enough

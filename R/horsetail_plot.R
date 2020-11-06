@@ -1,12 +1,13 @@
 #' Horsetail Plot
 #' @param samples (data.frame) output of clean_chains
+#' @param model (character) the model being run
 #' @param file_path (character) file path to store output xlsx file
 #' @param n_draws (numeric) the number of SR relations to be simulated
 #' @param sig_lev (numeric) significance level for the error bars
-#' @param s_up (numeric) vector of length 1 specifying the upper bounds for the x axis.
-#' @param r_up (numeric) vector of length 2 specifying the upper bound for the y axis. The first entry cooresponds to the Chena while the second entry cooresponds to the Salcha.
 #' @param width (numeric) width of the output plot (in px)
 #' @param height (numeric) height of the output plot (in px)
+#' @param s_up (numeric) vector of length 1 specifying the upper bounds for the x axis.
+#' @param r_up (numeric) vector of length 2 specifying the upper bound for the y axis. The first entry cooresponds to the Chena while the second entry cooresponds to the Salcha.
 #' @export
 horsetail_plot <- function(samples, model, file_path, n_draws=25, sig_lev=0.50, width=800, height=800, s_up=20000, r_up=c(30000, 30000)){
   

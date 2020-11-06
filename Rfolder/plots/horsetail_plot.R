@@ -10,6 +10,18 @@
 #' @export
 horsetail_plot <- function(samples, model, file_path, n_draws=25, sig_lev=0.50, width=800, height=800, s_up=20000, r_up=c(30000, 30000)){
   
+  
+  
+  
+  n_draws=50
+  sig_lev = 0.50
+  r_up=c(35000, 65000)
+  file_path=paste("Plots/horsetail/", model_specs$run_name, ".jpeg", sep="")
+  width=800
+  height=800
+  s_up=20000
+  
+  
   if (is.element(model, c("base_tvp", "base_tvp_ld"))){
     stop(paste("Function has not been set up for", model))
   }
@@ -33,7 +45,8 @@ horsetail_plot <- function(samples, model, file_path, n_draws=25, sig_lev=0.50, 
   
   jpeg(file_path, width=width, height=height, unit="px")
   
-  par(mfrow=c(2,1))
+  dev.off()
+  par(mfrow=c(1,1))
   
   plot(1, type="n", xlab="Number of Spawners", ylab="Number of Recruits", main="Chena River", xlim=c(0, s_up), ylim=c(0, r_up[1]), font.lab=2, cex.main=2, cex.lab=1.5)
   
@@ -168,6 +181,8 @@ horsetail_plot <- function(samples, model, file_path, n_draws=25, sig_lev=0.50, 
     
     
   }else{
+    
+    
     rs <- function(S, alpha, beta){
       alpha*S*exp(-beta*S)
     }
@@ -189,37 +204,41 @@ horsetail_plot <- function(samples, model, file_path, n_draws=25, sig_lev=0.50, 
       lines(S, R, lwd=1, col=rgb(0,0,1,0.3))
     }
     
-    labs <- substr(as.character(1986:2020), 3, 4)
+    labs <- substr(as.character(1986:2018), 3, 4)
     
     # Add Estimates of the Number of Spawners and the number of Recruits
-    S_est <- apply(spawners_c, MARGIN=2, median)
-    R_est <- apply(recruits_c, MARGIN=2, median)
-    points(S_est, R_est, col=rgb(1,0,0,1), cex=1.5, pch=19)
-    
-    # pos <- rep(NULL, length(labs)) 
-    # pos[which(labs=="01")] <- 2
-    # pos[which(labs=="04")] <- 4
-    # for(i in 1:length(labs)){
-    #   if (is.na(pos[i])){
-    #     print(text(R_est[i]~S_est[i], labels = labs[i], cex=1, font=4))
-    #   }
-    #   else{
-    #     print(text(R_est[i]~S_est[i], labels = labs[i], pos=pos[i], cex=1, font=4))
-    #   }
-    # }
+    S_est <- apply(spawners_c, MARGIN=2, median)[1:33]
+    R_est <- apply(recruits_c, MARGIN=2, median)[1:33]
+    points(S_est, R_est, col=rgb(1,0,0,0.3), cex=1.5, pch=19)
     
     
     # Add Error Bars to the Estimates
-    S_lo <- apply(spawners_c, MARGIN=2, quantile, probs=sig_lev/2)
-    S_hi <- apply(spawners_c, MARGIN=2, quantile, probs=1-sig_lev/2)
+    S_lo <- apply(spawners_c, MARGIN=2, quantile, probs=sig_lev/2)[1:33]
+    S_hi <- apply(spawners_c, MARGIN=2, quantile, probs=1-sig_lev/2)[1:33]
     
-    R_lo <- apply(recruits_c, MARGIN=2, quantile, probs=sig_lev/2)
-    R_hi <- apply(recruits_c, MARGIN=2, quantile, probs=1-sig_lev/2)
+    R_lo <- apply(recruits_c, MARGIN=2, quantile, probs=sig_lev/2)[1:33]
+    R_hi <- apply(recruits_c, MARGIN=2, quantile, probs=1-sig_lev/2)[1:33]
     
     for (i in 1:length(S_lo)){
-      lines(c(S_lo[i], S_hi[i]), c(R_est[i], R_est[i]), col=rgb(1,0,0,1), lwd=2)
-      lines(c(S_est[i], S_est[i]), c(R_lo[i], R_hi[i]), col=rgb(1,0,0,1), lwd=2)
+      lines(c(S_lo[i], S_hi[i]), c(R_est[i], R_est[i]), col=rgb(1,0,0,0.3), lwd=2)
+      lines(c(S_est[i], S_est[i]), c(R_lo[i], R_hi[i]), col=rgb(1,0,0,0.3), lwd=2)
     }
+    
+    #####
+    pos <- rep(NULL, length(labs)) 
+    pos[which(labs=="01")] <- 2
+    pos[which(labs=="04")] <- 4
+    for(i in 1:length(labs)){
+      i=34
+      if (is.na(pos[i])){
+        print(text(R_est[i]~S_est[i], labels = labs[i], cex=1, font=4))
+      }
+      else{
+        print(text(R_est[i]~S_est[i], labels = labs[i], pos=pos[i], cex=1, font=4))
+      }
+    }
+    34
+    #####
     
     plot(1, type="n", xlab="Number of Spawners", ylab="Number of Recruits", main="Salcha River", xlim=c(0, s_up), ylim=c(0, r_up[2]), font.lab=2, cex.main=2, cex.lab=1.5)
     
@@ -246,36 +265,45 @@ horsetail_plot <- function(samples, model, file_path, n_draws=25, sig_lev=0.50, 
     }
     
     # Add Estimates of the Number of Spawners and the number of Recruits
-    S_est <- apply(spawners_s, MARGIN=2, median)
-    R_est <- apply(recruits_s, MARGIN=2, median)
-    points(S_est, R_est, col=rgb(1,0,0,1), cex=1.5, pch=19)
+    S_est <- apply(spawners_s, MARGIN=2, median)[1:33]
+    R_est <- apply(recruits_s, MARGIN=2, median)[1:33]
+    points(S_est, R_est, col=rgb(1,0,0,0.3), cex=1.5, pch=19)
     
     pos <- rep(NULL, length(labs))
     pos[which(labs=="20")] <- 2
     pos[which(labs=="05")] <- 4
     pos[which(labs=="96")] <- 2
     pos[which(labs=="15")] <- 4
-    # for(i in 1:length(labs)){
-    #   if (is.na(pos[i])){
-    #     print(text(R_est[i]~S_est[i], labels = labs[i], cex=1, font=4))
-    #   }
-    #   else{
-    #     print(text(R_est[i]~S_est[i], labels = labs[i], pos=pos[i], cex=1, font=4))
-    #   }
-    # }
+    
+  
     
     # Add Error Bars to the Estimates
-    S_lo <- apply(spawners_s, MARGIN=2, quantile, probs=sig_lev/2)
-    S_hi <- apply(spawners_s, MARGIN=2, quantile, probs=1-sig_lev/2)
+    S_lo <- apply(spawners_s, MARGIN=2, quantile, probs=sig_lev/2)[1:33]
+    S_hi <- apply(spawners_s, MARGIN=2, quantile, probs=1-sig_lev/2)[1:33]
     
-    R_lo <- apply(recruits_s, MARGIN=2, quantile, probs=sig_lev/2)
-    R_hi <- apply(recruits_s, MARGIN=2, quantile, probs=1-sig_lev/2)
+    R_lo <- apply(recruits_s, MARGIN=2, quantile, probs=sig_lev/2)[1:33]
+    R_hi <- apply(recruits_s, MARGIN=2, quantile, probs=1-sig_lev/2)[1:33]
     
     for (i in 1:length(S_lo)){
-      lines(c(S_lo[i], min(S_hi[i], s_up)), c(R_est[i], R_est[i]), col=rgb(1,0,0,1), lwd=2)
-      lines(c(S_est[i], S_est[i]), c(R_lo[i], R_hi[i]), col=rgb(1,0,0,1), lwd=2)
+      lines(c(S_lo[i], min(S_hi[i], s_up)), c(R_est[i], R_est[i]), col=rgb(1,0,0,0.3), lwd=2)
+      lines(c(S_est[i], S_est[i]), c(R_lo[i], R_hi[i]), col=rgb(1,0,0,0.3), lwd=2)
     }
+    
+    ######
+    for(i in 1:length(labs)){
+      i=25
+      if (is.na(pos[i])){
+          print(text(R_est[i]~S_est[i], labels = labs[i], cex=1, font=4))
+       
+      }
+      else{
+        print(text(R_est[i]~S_est[i], labels = labs[i], pos=pos[i], cex=1, font=4))
+      }
+    }
+    #####
+    
 
     dev.off()
   }
 }
+

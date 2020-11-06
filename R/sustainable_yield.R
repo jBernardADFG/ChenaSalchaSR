@@ -1,10 +1,12 @@
 #' Sustainable Yield Plot
 #' @param samples (data.frame) output of clean_chains.
+#' @param model (character) the model being run.
 #' @param file_path (character) file path to store the output jpeg file.
 #' @param alpha (numeric) desired significance level for credible intervals.
 #' @param leg_pos (numeric) vector of length 2 specifing the x and y coordinate where the legend should be positioned.
 #' @param width (numeric) width of the output plot (in px).
 #' @param height (numeric) height of the output plot (in px).
+#' @param y_up (numeric) the upper bound on of y-axis.
 #' @export
 sy_plot <- function(samples, model, file_path, alpha=0.50, leg_pos=c(17500, 40000), width=750, height=750, y_up=70000){
   
@@ -65,6 +67,7 @@ sy_plot <- function(samples, model, file_path, alpha=0.50, leg_pos=c(17500, 4000
     dev.off()
   }
   if (is.element(model, c("base_tvp"))){
+    
     jpeg(file_path, width=width, height=height, unit="px")
     
     sy_c <- samples[,substr(names(samples), 1, 2)=="SY" &
@@ -74,10 +77,17 @@ sy_plot <- function(samples, model, file_path, alpha=0.50, leg_pos=c(17500, 4000
     S <- (1:450)*50
     R_med_c <- apply(sy_c, MARGIN=2, quantile, prob=0.50)
     R_med_s <- apply(sy_s, MARGIN=2, quantile, prob=0.50)
+    R_lo_c <- apply(sy_c, MARGIN=2, quantile, prob=0.05)
+    R_lo_s <- apply(sy_s, MARGIN=2, quantile, prob=0.05)
+    R_hi_c <- apply(sy_c, MARGIN=2, quantile, prob=0.95)
+    R_hi_s <- apply(sy_s, MARGIN=2, quantile, prob=0.95)
     
     n_years <- length(1986:2030)
     R_med_c_mat <- R_med_s_mat <- R_lo_c_mat <- R_hi_c_mat <- R_lo_s_mat <- R_hi_s_mat <- matrix(NA, nrow=450,  ncol=n_years)
     l <- 1
+    
+    # To Here #
+    
     for (j in 1:n_years){
       for (i in 1:450){
         R_med_c_mat[i, j] <- R_med_c[l]

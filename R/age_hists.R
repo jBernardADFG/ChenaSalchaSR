@@ -4,7 +4,8 @@
 #' @param width (numeric) width of the output plot (in px).
 #' @param height (numeric) height of the output plot (in px).
 #' @export
-age_hist <- function(samples, file_path, width=500, height=1000, final_year=2020){
+age_hist <- function(samples, file_path, width=500, height=1000){
+  final_year<- 2030
   aba_samples <- samples[,substr(names(samples), 1, 3)=="N_1" &
                            substr(names(samples), 4, 4)!="_"]
   quants <- apply(aba_samples, MARGIN=2, quantile, probs = c(0.5))

@@ -95,10 +95,10 @@ write_jags_model.base_tvm_ar <- function(path){
           logistic[y,r,a] <- exp(n[1,r,a]+n[2,r,a]*y)
         }
       }
-      D[r] ~ dexp(0.001)T(1,)
+      D[r] ~ dexp(0.01)T(1,)
       for (a in 1:6){
-        n[1,r,a] ~ dunif(-1000, 1000)
-        n[2,r,a] ~ dunif((-1000-n[1,r,a])/n_years, (1000-n[1,r,a])/n_years)
+        n[1,r,a] ~ dunif(-10, 10)
+        n[2,r,a] ~ dunif((-10-n[1,r,a])/n_years, (10-n[1,r,a])/n_years)
       }
     }
   

@@ -3,8 +3,8 @@
 #' @param alpha (numeric) desired significance level for credible intervals
 #' @param file_path (character) file path to store output xlsx file.
 #' @export
-extract_abundance_estimates <- function(samples, alpha=0.10, final_year=2030, file_path){
-  
+extract_abundance_estimates <- function(samples, alpha=0.10, file_path){
+  final_year=2030
   chena_total <- samples[,substr(names(samples), 1, 7) == "N_1_dot" & 
                           substr(names(samples), nchar(names(samples))-1, nchar(names(samples))-1)==1]
   salcha_total <- samples[,substr(names(samples), 1, 7) == "N_1_dot" & 

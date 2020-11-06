@@ -1,6 +1,6 @@
 #' Read in and format data for JAGS
-#' @param file_path (String) Directory to the xlsx data. Note: the format of the excel table needs to be standardized (see Data/2020-Data.xlsx).
-#' @param type (String) The type of analysis to run. Accepted values are "Paired", "Chena", and "Salcha".
+#' @param file_path (character) Directory to the xlsx data. Note: the format of the excel table needs to be standardized (see Data/2020-Data.xlsx).
+#' @param model (character) The model being run.
 #' @export
 
 get_jags_data <- function(file_path, model){

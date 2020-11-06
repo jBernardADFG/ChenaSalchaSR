@@ -3,7 +3,8 @@
 #' @param alpha (numeric) desired significance level for credible intervals.
 #' @param file_path (character) file path to store output xlsx file.
 #' @export
-extract_abundance_by_age <- function(samples, alpha, file_path, final_year=2020){
+extract_abundance_by_age <- function(samples, alpha, file_path){
+  final_year <- 2030
   aba_samples <- samples[,substr(names(samples), 1, 3)=="N_1" &
                           substr(names(samples), 4, 4)!="_"]
   quants <- apply(aba_samples, MARGIN=2, quantile, probs = c(0.5, alpha/2, 1-alpha/2) )

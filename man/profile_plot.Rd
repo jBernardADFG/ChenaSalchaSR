@@ -19,7 +19,11 @@ profile_plot(
 \arguments{
 \item{samples}{(data.frame) output of clean_chains.}
 
+\item{model}{(character) the model being run}
+
 \item{file_path}{(character) file path to store the output jpeg file.}
+
+\item{old_goal_med}{(numeric) vector of length 2 specifying the old escapement goal. The first entry cooresponds to the Chena while the second entry cooresponds to the Salcha.}
 
 \item{old_goal_lo}{(numeric) vector of length 2 specifying the lower bound of the old escapement goal. The first entry cooresponds to the Chena while the second entry cooresponds to the Salcha.}
 
@@ -30,8 +34,6 @@ profile_plot(
 \item{width}{(numeric) the width of the output jpeg file (in px).}
 
 \item{height}{(numeric) the height of the output jpeg file (in px).}
-
-\item{old_goal_median}{(numeric) vector of length 2 specifying the old escapement goal. The first entry cooresponds to the Chena while the second entry cooresponds to the Salcha.}
 }
 \description{
 Optimal Yield, Overfishing, and Optimal Recruitment Probability Plot

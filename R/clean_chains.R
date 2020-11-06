@@ -1,6 +1,6 @@
 #' Convert chains to an easier to use format and burnin further if the burnin period was not long enough
 #' @param samples Output of jagsUI::jags
-#' @param burnin_further The number of additional MCMC iterations to discard as burnin
+#' @param burnin_further (numeric) The number of additional MCMC iterations to discard as burnin
 #' @export
 clean_chains <- function(samples, burnin_further=0){
   samps <- samples$samples

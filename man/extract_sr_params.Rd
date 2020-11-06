@@ -9,6 +9,8 @@ extract_sr_params(samples, model, alpha, file_path)
 \arguments{
 \item{samples}{(data.frame) output of clean_chains}
 
+\item{model}{(character) the model being run}
+
 \item{alpha}{(numeric) desired significance level for credible intervals}
 
 \item{file_path}{(character) file path to store output xlsx file}

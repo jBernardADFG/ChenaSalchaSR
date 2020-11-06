@@ -7,9 +7,9 @@
 get_jags_data(file_path, model)
 }
 \arguments{
-\item{file_path}{(String) Directory to the xlsx data. Note: the format of the excel table needs to be standardized (see Data/2020-Data.xlsx).}
+\item{file_path}{(character) Directory to the xlsx data. Note: the format of the excel table needs to be standardized (see Data/2020-Data.xlsx).}
 
-\item{type}{(String) The type of analysis to run. Accepted values are "Paired", "Chena", and "Salcha".}
+\item{model}{(character) The model being run.}
 }
 \description{
 Read in and format data for JAGS

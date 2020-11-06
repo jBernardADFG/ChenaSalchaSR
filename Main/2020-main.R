@@ -1,78 +1,89 @@
-# TO DO #
-# SOME RESIDUAL DIAGNOSTICS -- WRITE FUNCTION TO GENERATE PLOT -- DOCUMENT DECREASES IN PRODUCTIVITY #
-# PREDICTED ALLOWABLE HARVEST #
-# MIGHT BE INTERESTING TO RELATE TO SIZE AND AGE-AT-MATURITY #
-
-# CLEAR GLOBAL ENVIRONMENT
+# CLEAR GLOBAL ENVIRONMENT #
 rm(list=objects())
 
-# INSTALL PROJECT PACKAGE -- once the package has been installed, you do not need to rerun this line 
+# INSTALL PROJECT PACKAGE -- once the package has been installed, you do not need to rerun this line # 
 devtools::install_github("jBernardADFG/ChenaSalchaSR", force=T)
 
-# LOAD PROJECT PACKAGE
+# LOAD PROJECT PACKAGE #
 library(ChenaSalchaSR)
 
-# WHICH MODEL IS BEING RUN ? 
-# choose one of the following options:
+# WHICH MODEL IS BEING RUN? -- run one of the following lines of code #
 model <- "base" # basic Ricker model
-model <- "base_tvm" # time varying age-at-maturity added to base Ricker 
-model <- "base_ar" # AR(1) term added to base Ricker --
-model <- "base_tvm_ar" # time varying age-at-maturity and AR(1) term added to base Ricker -- this is basically what was used on the Copper
+model <- "base_tvm" # basic ricker model + time varying age-at-maturity 
+model <- "base_ar" # basic ricker model + AR(1) term
 
-# I was having some trouble with these models -- let's cook the first four them come back #
-model <- "base_tvp" # time varying productivity term added to base Ricker
-model <- "base_tvm_tvp" # time varying maturity and time varying productivity added to base Ricker  
-model <- "base_tvm_ar_tvp" # time varying age-at-maturity, AR(1), and time varying productivity terms added to base Ricker
+model <- "base_tvm_ar" # basic ricker model + time varying age-at-maturity + AR(1) term
 
-# still working on implementing these:
-model <- "base_tvm_ar_ash" # time varying age-at-maturity, AR(1), and age-stratified-harvest terms added to base Ricker
-model <- "base_tvm_ar_ld" # low-density Ricker curve with time-varying productivity and AR(1) terms
-model <- "base_tvm_ar_wl" # time varying age-at-maturity, AR(1), and water level terms added to base Ricker
+model <- "base_tvp" # basic ricker model + time varying productivity term 
 
-# READ IN DATA AND FORMAT FOR USE IN JAGS MODEL
+# Fun Ideas I'm still working on #
+model <- "base_tvm_ar_ash" # basic Ricker model +  time varying age-at-maturity + AR(1) term + age-stratified-harvest term
+model <- "base_tvm_ar_ld" # low density Ricker + time varying age-at-maturity + AR(1) term
+model <- "base_tvm_ar_wl" # basic Ricker model + time varying age-at-maturity + AR(1) term + water-level term
+model <- "base_tvm_ar_tvp" # basic Ricker model + time varying age-at-maturity + time varying productivity
+
+# READ IN DATA AND FORMAT FOR USE IN JAGS MODEL #
 {
   setwd("S:/Jordy/ChenaSalchaSR/R/WorkingDirectory")
   data <- get_jags_data("Data/2020-Data-Median.xlsx", model)
-  # data <- get_jags_data("Data/2020-Data-Max.xlsx") # to use different harvest SE's for sensitivity testing
+  # data <- get_jags_data("Data/2020-Data-Max.xlsx") # To use different harvest SEs for sensitivity testing
 }
 
-# GET .JAGS FILE PATH
+# GET FILE PATH TO .JAGS FILE #
 mod_path <- paste("Jags/", model, ".jags", sep="")
 
-# SAVE JAGS MODULE AS .JAGS FILE -- only needs to be run when modifications have been made to a jags module
+# SAVE JAGS MODULE AS .JAGS FILE -- you should only run this line if modifications have been made to a .Jags file #
 save_jags_model(mod_path, model)
 
-# PARAMETERS TO MONITOR
-params <- get_params(model)     #####
+# GET PARAMETERS TO MONITOR #
+params <- get_params(model)
 
-# SET MODEL SPECIFICATIONS
+# SET MODEL SPECIFICATIONS #
 model_specs <- set_model_specifications(
-  run_name = "another base run",
-  notes = "another base run",
-  n_chains = 4,
-  n_iter = 500000, #500000 #3500000 
-  n_burnin = 250000, #250000 #250000
-  n_thin = 100, #500 #1000
+  run_name = "final_base_tvm_ar_1",
+  notes = "final_base_tvm_ar_1",
+  n_chains = 6,
+  n_iter = 7000000, # 3500000 
+  n_burnin = 3500000, # 250000
+  n_thin = 2000, # 1000
   parallel = F
 )
 
-# RUN JAGS MODEL
+# RUN JAGS MODEL #
+# Note: This is a model that will not run in 4 hours
+# To get the thing to converge, the program picks initial values for alpha and beta (the estimates reported in the last Chena/Salcha report are used)
+# The MCMC routine is then run for 3500000 iterations
+# Once this is done, the end values of the chains are used as initial values for the real run which should be run for at least 3500000 iterations
+# You're probably looking 3-4 days of computation time if you want |R^2| < 1.1 for all parameters
 {
   start_time <- Sys.time()
+  jags_out <- jagsUI::jags(
+    data = data,
+    parameters.to.save = params,
+    model.file = mod_path,
+    n.chains = model_specs$n_chains,
+    n.iter = model_specs$n_burnin,
+    n.burnin = 1,
+    n.thin = model_specs$n_thin,
+    parallel = model_specs$parallel,
+    inits=get_initial_values(model)
+  )
+  run_time <- Sys.time()-start_time
+  start_time <- Sys.time()
   jags_out <- jagsUI::jags(data = data,
-                          parameters.to.save = params,
-                          model.file = mod_path,
-                          n.chains = model_specs$n_chains,
-                          n.iter = model_specs$n_iter,
-                          n.burnin = model_specs$n_burnin,
-                          n.thin = model_specs$n_thin,
-                          parallel = model_specs$parallel,
-                          inits=get_initial_values(model)
-                          )
+                           parameters.to.save = params,
+                           model.file = mod_path,
+                           n.chains = model_specs$n_chains,
+                           n.iter = model_specs$n_iter,
+                           n.burnin = 1,
+                           n.thin = model_specs$n_thin,
+                           parallel = model_specs$parallel,
+                           inits=get_new_inits(jags_out)
+  )
   run_time <- Sys.time()-start_time
 }
 
-# SAVE CHAINS AND USEFUL INFO RELATED TO MODEL RUN
+# SAVE CHAINS AND USEFUL INFO RELATED TO MODEL RUN #
 {
   save(jags_out, file=paste("Rdata/", model_specs$run_name, ".Rdata", sep=""))
   save_run_info(model_specs, run_time, jags_out, file_path="Tables/run_info.xlsx")
@@ -88,12 +99,12 @@ MCMCvis::MCMCtrace(jags_out,
 # CONVERT CHAINS TO AN EASIER TO USE FORMAT AND DISCARD INITIAL SAMPLES IF THE BURNIN PERIOD WAS NOT LONG ENOUGH
 samples <- clean_chains(jags_out)
 
-# CREATE TABLES
+# CREATE TABLES #
 {
   extract_abundance_estimates(samples, 
                               alpha=0.10, 
                               file_path = paste("Tables/abundance_estimates/", model_specs$run_name, ".xlsx", sep=""),
-                              final_year = 2030) # Looks good
+                              final_year = 2030)
   
   extract_abundance_by_age(samples, 
                            alpha=0.10, 
@@ -111,7 +122,7 @@ samples <- clean_chains(jags_out)
                     file_path=paste("Tables/sr_params/", model_specs$run_name, ".xlsx", sep=""))
 }
 
-# CREATE PLOTS
+# CREATE PLOTS #
 {
   age_hist(samples, 
            file_path=paste("Plots/age_hists/", model_specs$run_name, ".jpeg", sep=""),
@@ -120,7 +131,7 @@ samples <- clean_chains(jags_out)
   horsetail_plot(samples,
                  model,
                  n_draws=50,
-                 sig_lev = 0.1,
+                 sig_lev = 0.50,
                  r_up=c(35000, 65000),
                  file_path=paste("Plots/horsetail/", model_specs$run_name, ".jpeg", sep=""))
   

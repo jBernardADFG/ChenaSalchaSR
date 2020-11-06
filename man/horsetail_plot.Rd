@@ -19,6 +19,8 @@ horsetail_plot(
 \arguments{
 \item{samples}{(data.frame) output of clean_chains}
 
+\item{model}{(character) the model being run}
+
 \item{file_path}{(character) file path to store output xlsx file}
 
 \item{n_draws}{(numeric) the number of SR relations to be simulated}

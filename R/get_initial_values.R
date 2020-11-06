@@ -1,4 +1,5 @@
-#' Get a set of initial values for alpha and beta
+#' Get a set of initial values for alpha and beta (the initial values are the estimates reported in the last Chena/Salcha report)
+#' @param model (character) The model being run
 #' @export
 get_initial_values <- function(model){
   if (!is.element(model, c("base_tvp", "base_tvm_tvp", "base_tvm_ar_tvp", "base_tvp_ld"))){

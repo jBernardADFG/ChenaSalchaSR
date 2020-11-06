@@ -18,6 +18,8 @@ sy_plot(
 \arguments{
 \item{samples}{(data.frame) output of clean_chains.}
 
+\item{model}{(character) the model being run.}
+
 \item{file_path}{(character) file path to store the output jpeg file.}
 
 \item{alpha}{(numeric) desired significance level for credible intervals.}
@@ -27,6 +29,8 @@ sy_plot(
 \item{width}{(numeric) width of the output plot (in px).}
 
 \item{height}{(numeric) height of the output plot (in px).}
+
+\item{y_up}{(numeric) the upper bound on of y-axis.}
 }
 \description{
 Sustainable Yield Plot

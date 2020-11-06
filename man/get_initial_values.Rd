@@ -2,10 +2,13 @@
 % Please edit documentation in R/get_initial_values.R
 \name{get_initial_values}
 \alias{get_initial_values}
-\title{Get a set of initial values for alpha and beta}
+\title{Get a set of initial values for alpha and beta (the initial values are the estimates reported in the last Chena/Salcha report)}
 \usage{
 get_initial_values(model)
 }
+\arguments{
+\item{model}{(character) The model being run}
+}
 \description{
-Get a set of initial values for alpha and beta
+Get a set of initial values for alpha and beta (the initial values are the estimates reported in the last Chena/Salcha report)
 }

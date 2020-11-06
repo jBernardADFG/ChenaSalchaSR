@@ -3,8 +3,8 @@
 #' @param alpha (numeric) desired significance level for credible intervals
 #' @param file_path (character) file path to store output xlsx file.
 #' @export
-extract_age_at_maturity <- function(samples, alpha, file_path, final_year=2020){
-  
+extract_age_at_maturity <- function(samples, alpha, file_path){
+  final_year <- 2030
   aam_samples <- samples[,substr(names(samples), 1, 1) == "p" &
                           substr(names(samples), 2, 2) != "h"]
   quants <- apply(aam_samples, MARGIN=2, quantile, probs = c(0.5, alpha/2, 1-alpha/2) )
