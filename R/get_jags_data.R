@@ -1,5 +1,5 @@
-#' Read in and format data for JAGS
-#' @param file_path (character) Directory to the xlsx data. Note: the format of the excel table needs to be standardized (see Data/2020-Data.xlsx).
+#' Reads in and formats data so that it can be crammed into JAGS model
+#' @param file_path (character) Directory to the xlsx file housing the input data. Note: the format of the excel table needs to be standardized (see WorkingDirectory/Data/2020-Data-Median.xlsx).
 #' @param model (character) The model being run.
 #' @export
 

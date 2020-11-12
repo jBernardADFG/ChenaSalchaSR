@@ -2,7 +2,7 @@
 % Please edit documentation in R/extract_sr_params.R
 \name{extract_sr_params}
 \alias{extract_sr_params}
-\title{Extract biological reference points and parameters contained in the SR relationship}
+\title{Extract biological reference points and parameters estimates from posterior samples}
 \usage{
 extract_sr_params(samples, model, alpha, file_path)
 }
@@ -16,5 +16,5 @@ extract_sr_params(samples, model, alpha, file_path)
 \item{file_path}{(character) file path to store output xlsx file}
 }
 \description{
-Extract biological reference points and parameters contained in the SR relationship
+Extract biological reference points and parameters estimates from posterior samples
 }

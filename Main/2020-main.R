@@ -11,9 +11,7 @@ library(ChenaSalchaSR)
 model <- "base" # basic Ricker model
 model <- "base_tvm" # basic ricker model + time varying age-at-maturity 
 model <- "base_ar" # basic ricker model + AR(1) term
-
 model <- "base_tvm_ar" # basic ricker model + time varying age-at-maturity + AR(1) term
-
 model <- "base_tvp" # basic ricker model + time varying productivity term 
 
 # Fun Ideas I'm still working on #

@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_params.R
 \name{get_params}
 \alias{get_params}
-\title{Retrieve model specific parameters to monitor}
+\title{Retrieves the appropriate parameters to monitor}
 \usage{
 get_params(model)
 }
@@ -10,5 +10,5 @@ get_params(model)
 \item{model}{(character) the model that is being run. Accepted values are "base", "base_tvm", "base_ar", "base_tvm_ar", and "base_tvp".}
 }
 \description{
-Retrieve model specific parameters to monitor
+Retrieves the appropriate parameters to monitor
 }

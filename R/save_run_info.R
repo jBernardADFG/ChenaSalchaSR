@@ -1,9 +1,9 @@
-#' Save useful model run info #
-#' @param model_specs (list) Named list specifying the run specifications.
+#' Add entry to log book #
+#' @param model_specs (list) List output by set_model_specifications specifying the run specifications. 
 #' @param run_time (difftime) The time it took for the model to run.
 #' @param DIC (numeric) DIC reported by JAGS.
-#' @param file_path (character) File path to save model run information.
-#' @param exists (logical) If a model run information table already exists, use exists=T. Use exists=F otherwise.
+#' @param file_path (character) File path to log book.
+#' @param exists (logical) If model run information table exists, use exists=T. Use exists=F otherwise.
 #' @export
 save_run_info <- function(model_specs, run_time, DIC, pD, file_path="Tables/run_info.xlsx", exists=T){
   DIC <- jags_out$DIC

@@ -1,4 +1,4 @@
-#' Extract biological reference points and parameters contained in the SR relationship
+#' Extract biological reference points and parameters estimates from posterior samples
 #' @param samples (data.frame) output of clean_chains
 #' @param model (character) the model being run
 #' @param alpha (numeric) desired significance level for credible intervals

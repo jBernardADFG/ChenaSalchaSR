@@ -1,4 +1,4 @@
-#' Retrieve model specific parameters to monitor
+#' Retrieves the appropriate parameters to monitor
 #' @param model (character) the model that is being run. Accepted values are "base", "base_tvm", "base_ar", "base_tvm_ar", and "base_tvp".
 #' @export
 

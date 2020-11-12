@@ -2,7 +2,7 @@
 % Please edit documentation in R/save_run_info.R
 \name{save_run_info}
 \alias{save_run_info}
-\title{Save useful model run info #}
+\title{Add entry to log book #}
 \usage{
 save_run_info(
   model_specs,
@@ -14,16 +14,16 @@ save_run_info(
 )
 }
 \arguments{
-\item{model_specs}{(list) Named list specifying the run specifications.}
+\item{model_specs}{(list) List output by set_model_specifications specifying the run specifications.}
 
 \item{run_time}{(difftime) The time it took for the model to run.}
 
 \item{DIC}{(numeric) DIC reported by JAGS.}
 
-\item{file_path}{(character) File path to save model run information.}
+\item{file_path}{(character) File path to log book.}
 
-\item{exists}{(logical) If a model run information table already exists, use exists=T. Use exists=F otherwise.}
+\item{exists}{(logical) If model run information table exists, use exists=T. Use exists=F otherwise.}
 }
 \description{
-Save useful model run info #
+Add entry to log book #
 }
